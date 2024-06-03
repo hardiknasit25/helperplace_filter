@@ -29,7 +29,7 @@ function Header() {
         <div className="flex justify-center items-center w-[70%]">
           <ul className="flex justify-start w-full">
             {option.map((item) => (
-              <li className="ps-10 font-semibold hover:text-[#054a84]" key={item}>{item.name}</li>
+              <li className="ps-10 font-semibold hover:text-[#054a84] cursor-pointer" key={item}>{item.name}</li>
             ))}
           </ul>
         </div>
