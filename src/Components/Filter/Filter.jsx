@@ -1,8 +1,9 @@
 import { MdOutlineRefresh } from "react-icons/md";
+// import { Select } from '@mantine/core';
 
 function Filter() {
   return (
-    <div className="w-[25%] rounded-md ps-[15px] pr-[15px] mt-10 pb-5 border-[1px] border-[#9999] bg-[#F9F9F9]">
+    <div className="w-[30%] rounded-md ps-[15px] pr-[15px] mt-10 pb-5 border-[1px] border-[#9999] bg-[#F9F9F9]">
 
       <div className="p-2 mt-4">
         <span className="text-primary text-2xl mt-2">I'm Looking For</span>
@@ -102,8 +103,18 @@ function Filter() {
 
             <div className="flex flex-col gap-3 mt-3">
               <span className="text-primary text-lg font-semibold">Contranct Status</span>
-              <input type="date" className="border-[1px] border-[#9999] p-2 rounded text-sm text-secondary outline-none" />
+              {/* <input type="date" className="border-[1px] border-[#9999] p-2 rounded text-sm text-secondary outline-none" /> */}
+
+              {/* <Select
+                label="Your favorite library"
+                placeholder="Pick value"
+                data={['React', 'Angular', 'Vue', 'Svelte']}
+              /> */}
+
             </div>
+
+            
+
           </div>
 
 {/* Resume By */}
