@@ -21,7 +21,7 @@ function Header() {
   ]
   return (
     <div>
-      <div className="flex justify-start h-14 w-full mt-5">
+      <div className="flex justify-start h-14 w-full mt-2">
         <div className="w-[10%] h-full flex justify-center items-center">
           <img src={logo} alt="logo"/>
         </div>
