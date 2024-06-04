@@ -1,25 +1,8 @@
-import { useState } from 'react'
 import profile1 from '../../assets/profile1.jpg'
 import { FaCalendarAlt } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
 
 function People() {
-
-  const [data, setData] = useState([]);
-
-  const handleonClick = () => {
-    try {
-      const responce = fetch('https://api.helperplace.com/api/mobile/masterdata/GetAllMasterDataJson')
-      const data = responce.json
-      if (data.success === false) {
-        setData(data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  console.log(data);
 
   return (
     <div className="mt-10 w-full">
@@ -46,7 +29,7 @@ function People() {
           <div className="flex gap-5 mt-3">
             <span className="text-secondary font-semibold text-[16px]">Domestic Helper <span>- Finished Contract </span></span>
             <div className='flex justify-center items-center gap-1'>
-              <FaLocationDot className='text-[#25AE88]'/>
+              <FaLocationDot className='text-[#25AE88]' />
               <span className="text-primary font-semibold text-[16px]">Hong Kong</span>
             </div>
           </div>
@@ -60,7 +43,7 @@ function People() {
             </div>
 
             <div className='flex gap-1 justify-center items-center'>
-              <FaCalendarAlt className='text-[#25AE88]'/>
+              <FaCalendarAlt className='text-[#25AE88]' />
               <span className="text-primary font-semibold">From 07 Aug 2024 | Full Time</span>
             </div>
 
@@ -73,7 +56,6 @@ function People() {
 
       </div>
 
-      <button onClick={handleonClick}>Click me</button>
     </div>
   )
 }
