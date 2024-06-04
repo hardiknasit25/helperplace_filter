@@ -9,3 +9,8 @@
   box-sizing: border-box;
   font-family: 'poppins';
 }
+
+:root {
+  --primary-color: #054A84;
+  --secondary-color: #777777;
+}
