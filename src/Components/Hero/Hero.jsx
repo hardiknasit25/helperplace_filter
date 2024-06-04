@@ -5,6 +5,7 @@ import gma from '../../assets/GMA.png'
 import techin from '../../assets/tech-in-asia.png'
 import cna from '../../assets/CNA.png'
 import users from '../../assets/users_icon.png'
+import { FaSortAmountDown } from "react-icons/fa";
 
 function Hero() {
   return (
@@ -43,7 +44,8 @@ function Hero() {
       </div>
 
       <div className="w-full h-[37px] flex justify-end mt-4">
-          <button className="w-[150px] h-[37px] p-2 bg-[#25AE88] rounded-md text-white font-semibold">Last Active</button>
+        <FaSortAmountDown className="text-[#25AE88]" />
+        <button className="w-[150px] h-[37px] p-2 bg-[#25AE88] rounded-md text-white font-semibold">Last Active</button>
       </div>
     </>
   )
