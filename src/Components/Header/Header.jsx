@@ -1,4 +1,5 @@
 import logo from "../../assets/helperplace_logo.svg";
+import {Link} from 'react-router-dom'
 
 function Header() {
   const option = [
@@ -33,7 +34,7 @@ function Header() {
         <div className="flex justify-center items-center w-[70%]">
           <ul className="flex justify-start w-full">
             {option.map((item,index) => (
-              <li key={index} className="ps-10 font-semibold hover:text-[#054a84] cursor-pointer">{item.name}</li>
+              <Link key={index} className="ps-10 font-semibold hover:text-[#054a84] cursor-pointer">{item.name}</Link>
             ))}
           </ul>
         </div>
