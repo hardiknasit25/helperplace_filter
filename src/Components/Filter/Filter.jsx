@@ -1,7 +1,6 @@
 import { MdOutlineRefresh } from "react-icons/md";
 import { IoSearchOutline } from "react-icons/io5";
 import { useEffect, useState } from "react";
-// import { Select } from '@mantine/core';
 
 function Filter() {
 
@@ -19,9 +18,9 @@ function Filter() {
   const [currContract, setCurrContract] = useState("");
   const [currLocation, setCurrLocation] = useState("");
   const [currDate, setDate] = useState("");
+  const [age, setAge] = useState("30")
+  const [experience, setExperience] = useState("30");
   const [selectedOption, setSelectedOption] = useState("");
-
-  console.log("Option ", selectedOption);
 
   useEffect(() => {
     fetch("/api/mobile/masterdata/GetAllMasterDataJson")
@@ -51,11 +50,23 @@ function Filter() {
       .catch(error => console.error('Fetch error:', error));
   }, []);
 
+  const handleOnReset = () => {
+    setHelperName("");
+    setCurrContract("");
+    setCurrLanguage("");
+    setCurrLocation("");
+    setCurrNationality("");
+    setCurrSkill("");
+    setDate("");
+    setAge("30");
+    setExperience("30");
+  }
+
   return (
     <div className="w-[30%] rounded-md ps-[15px] pr-[15px] mt-10 pb-5 border-[1px] border-[#9999] bg-[#F9F9F9]">
 
       <div className="p-2 mt-4">
-        <span className="text-primary text-2xl mt-2">I'm Looking For</span>
+        <span className="text-primary text-2xl mt-2">{"I'm Looking For"}</span>
       </div>
 
       <div>
@@ -63,7 +74,7 @@ function Filter() {
         {/* Filter and reset  */}
         <div className="flex justify-between p-2">
           <span className="font-semibold text-primary text-lg">Filter</span>
-          <div className="flex justify-center items-center gap-1 cursor-pointer">
+          <div className="flex justify-center items-center gap-1 cursor-pointer" onClick={handleOnReset}>
             <MdOutlineRefresh className="text-[#24AE88] font-bold" />
             <span className="text-[#25AE88] font-semibold text-lg">Reset</span>
           </div>
@@ -81,7 +92,7 @@ function Filter() {
                 <input
                   type="radio"
                   name="radio"
-                  checked = {selectedOption === "1"}
+                  checked={selectedOption === "1"}
                   onChange={(e) => setSelectedOption(e.target.value)}
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
                   value="1"
@@ -105,7 +116,7 @@ function Filter() {
 
             <div className="flex flex-col gap-3 mt-3">
               <span className="text-primary text-lg font-semibold">Start Date</span>
-              <input type="date" className="border-[1px] border-[#9999] p-2 rounded text-sm text-secondary outline-none" onChange={(e) => setDate(e.target.value)}/>
+              <input type="date" className="border-[1px] border-[#9999] p-2 rounded text-sm text-secondary outline-none" onChange={(e) => setDate(e.target.value)} />
             </div>
 
             <div className="flex flex-col gap-3 mt-3">
@@ -206,7 +217,7 @@ function Filter() {
             <span className="text-primary font-semibold mt-5">Working Experience</span>
             <div className="w-full h-[2px] bg-[#25AE88]"></div>
 
-            <input type="range" id="points" name="points" min="0" max="40" className="mt-5"></input>
+            <input type="range" id="points" name="points" min="0" max="40" className="mt-5 w-full" value={experience} onChange={(e) => setExperience(e.target.value)}></input>
 
             <div className="flex flex-col gap-3 mt-3">
               <span className="text-primary text-lg font-semibold">Language</span>
@@ -273,7 +284,7 @@ function Filter() {
             <span className="text-primary font-semibold mt-5">Age</span>
             <div className="w-full h-[2px] bg-[#25AE88]"></div>
 
-            <input type="range" id="points" name="points" min="0" max="40" className="mt-5"></input>
+            <input type="range" id="points" name="points" min="0" max="40" className="mt-5 w-full" value={age} onChange={(e) => setAge(e.target.value)}></input>
 
             <div className="flex flex-col gap-3 mt-3">
               <span className="text-primary text-lg font-semibold">Helper Name</span>
