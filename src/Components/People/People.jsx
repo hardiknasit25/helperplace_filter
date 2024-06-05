@@ -7,7 +7,7 @@ function People() {
   return (
     <div className="mt-10 w-full">
 
-      <div className="h-[220px] flex gap-2 shadow-2xl pt-2 pb-2 rounded-md">
+      <div className="h-[220px] flex gap-2 shadow-2xl pt-2 pb-2 rounded-lg">
 
         {/* Photo  */}
         <div className="w-[35%] h-fullflex flex-col justify-center items-center">

@@ -1,9 +1,11 @@
 import { MdOutlineRefresh } from "react-icons/md";
 import { IoSearchOutline } from "react-icons/io5";
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "react"; 
+// import { useHistory } from "react-router-dom";
 
 function Filter() {
 
+  // const history = useHistory()
   const [data, setData] = useState([]);
   const [lang, setLang] = useState([]);
   const [contractStatus, setContractStatus] = useState([]);
@@ -18,9 +20,39 @@ function Filter() {
   const [currContract, setCurrContract] = useState("");
   const [currLocation, setCurrLocation] = useState("");
   const [currDate, setDate] = useState("");
-  const [age, setAge] = useState("30")
+  const [age, setAge] = useState("0")
   const [experience, setExperience] = useState("30");
-  const [selectedOption, setSelectedOption] = useState("");
+  const [jobPosition, setJobPosition] = useState("");
+  const [jobType, setJobType] = useState("");
+  const [resumeby, setResumeBy] = useState("");
+  const [gender, setGender] = useState("");
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams();
+    urlParams.set('helper_name', helperName)
+    urlParams.set("start_date", currDate)
+    urlParams.set("job_type_id", jobType)
+    urlParams.set("country_id", currLocation)
+    urlParams.set("position_id", jobPosition)
+    urlParams.set('nationality_id', currNationality)
+    urlParams.set('edu_id', currNationality)
+    urlParams.set('contract_status_id', currContract)
+    urlParams.set('resume_manager', resumeby)
+    urlParams.set('gender', gender)
+    urlParams.set('skill_id', currskill)
+    urlParams.set('age_min', "18")
+    urlParams.set('age_max', age)
+    urlParams.set('experience_min', "0")
+    urlParams.set('experience_max', experience)
+    urlParams.set('marital_status', currContract)
+    urlParams.set('order_by', currContract)
+    urlParams.set('location_order', currContract)
+    urlParams.set('lang', currlanguage)
+    const searchQuery = urlParams.toString();
+    console.log("SearchQuery : ", searchQuery);
+  }, [setHelperName, currNationality, currlanguage, currContract, currLocation, setDate, currskill, age, experience, jobType, jobPosition, gender, resumeby]);
+  // history.push(`/candidates?${searchQuery}`);
+
 
   useEffect(() => {
     fetch("/api/mobile/masterdata/GetAllMasterDataJson")
@@ -92,9 +124,9 @@ function Filter() {
                 <input
                   type="radio"
                   name="radio"
-                  checked={selectedOption === "1"}
-                  onChange={(e) => setSelectedOption(e.target.value)}
-                  className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
+                  checked={jobPosition === "1"}
+                  onChange={(e) => setJobPosition(e.target.value)}
+                  className={`form-radio h-5 w-5 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer ${jobPosition === "1" ? 'bg-green-500' : 'bg-blue-600'}`}
                   value="1"
                 />
                 <span>Domestic Helper</span>
@@ -104,8 +136,8 @@ function Filter() {
                 <input
                   type="radio"
                   name="radio"
-                  checked={selectedOption === "2"}
-                  onChange={(e) => setSelectedOption(e.target.value)}
+                  checked={jobPosition === "2"}
+                  onChange={(e) => setJobPosition(e.target.value)}
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
                   value="2"
                 />
@@ -121,9 +153,9 @@ function Filter() {
 
             <div className="flex flex-col gap-3 mt-3">
               <span className="text-primary text-lg font-semibold">Candidate Location</span>
-              <select className="border-[1px] border-[#9999] p-2 rounded text-sm text-secondary outline-none" value={currLocation} onChange={(e) => setCurrLocation(e.target.value)}>
+              <select className="border-[1px] border-[#9999] p-2 rounded text-sm text-secondary outline-none" value={currLocation} onChange={(e) => setCurrLocation(parseInt(e.target.value))}>
                 {jobLocation.map((location, index) => (
-                  <option key={index} value={location}>{location}</option>
+                  <option key={index} value={index}>{location}</option>
                 ))}
               </select>
             </div>
@@ -141,6 +173,8 @@ function Filter() {
                 <input
                   type="radio"
                   name="radio"
+                  checked={jobType === "1"}
+                  onChange={(e) => setJobType(e.target.value)}
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
                   value="1"
                 />
@@ -151,6 +185,8 @@ function Filter() {
                 <input
                   type="radio"
                   name="radio"
+                  checked={jobType === "2"}
+                  onChange={(e) => setJobType(e.target.value)}
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
                   value="2"
                 />
@@ -161,6 +197,8 @@ function Filter() {
                 <input
                   type="radio"
                   name="radio"
+                  checked={jobType === "3"}
+                  onChange={(e) => setJobType(e.target.value)}
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
                   value="3"
                 />
@@ -172,9 +210,9 @@ function Filter() {
             <div className="flex flex-col gap-3 mt-3">
               <span className="text-primary text-lg font-semibold">Contranct Status</span>
 
-              <select className="border-[1px] border-[#9999] p-2 rounded text-sm text-secondary outline-none" value={currContract} onChange={(e) => setCurrContract(e.target.value)}>
+              <select className="border-[1px] border-[#9999] p-2 rounded text-sm text-secondary outline-none" value={currContract} onChange={(e) => setCurrContract(parseInt(e.target.value))}>
                 {contractStatus.map((contract, index) => (
-                  <option key={index} value={contract}>{contract}</option>
+                  <option key={index} value={index}>{contract}</option>
                 ))}
               </select>
 
@@ -194,6 +232,8 @@ function Filter() {
                 <input
                   type="radio"
                   name="radio"
+                  checked={resumeby === "1"}
+                  onChange={(e) => setResumeBy(e.target.value)}
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
                   value="1"
                 />
@@ -204,6 +244,8 @@ function Filter() {
                 <input
                   type="radio"
                   name="radio"
+                  checked={resumeby === "2"}
+                  onChange={(e) => setResumeBy(e.target.value)}
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
                   value="2"
                 />
@@ -221,9 +263,9 @@ function Filter() {
 
             <div className="flex flex-col gap-3 mt-3">
               <span className="text-primary text-lg font-semibold">Language</span>
-              <select className="border-[1px] border-[#9999] p-2 rounded text-sm text-secondary outline-none" value={currlanguage} onChange={(e) => setCurrLanguage(e.target.value)}>
+              <select className="border-[1px] border-[#9999] p-2 rounded text-sm text-secondary outline-none" value={currlanguage} onChange={(e) => setCurrLanguage(parseInt(e.target.value))}>
                 {lang.map((language, index) => (
-                  <option key={index} value={language}>{language}</option>
+                  <option key={index} value={index}>{language}</option>
                 ))}
               </select>
             </div>
@@ -231,18 +273,18 @@ function Filter() {
 
             <div className="flex flex-col gap-3 mt-3">
               <span className="text-primary text-lg font-semibold">Main Skills</span>
-              <select className="border-[1px] border-[#9999] p-2 rounded text-sm text-secondary outline-none" value={currskill} onChange={(e) => setCurrSkill(e.target.value)}>
+              <select className="border-[1px] border-[#9999] p-2 rounded text-sm text-secondary outline-none" value={currskill} onChange={(e) => setCurrSkill(parseInt(e.target.value))}>
                 {skill.map((skill_name, index) => (
-                  <option value={skill_name} key={index}>{skill_name}</option>
+                  <option value={index} key={index}>{skill_name}</option>
                 ))}
               </select>
             </div>
 
             <div className="flex flex-col gap-3 mt-3">
               <span className="text-primary text-lg font-semibold">Nationality</span>
-              <select className="border-[1px] border-[#9999] p-2 rounded text-sm text-secondary outline-none" onChange={(e) => setCurrNationality(e.target.value)} value={currNationality}>
+              <select className="border-[1px] border-[#9999] p-2 rounded text-sm text-secondary outline-none" onChange={(e) => setCurrNationality(parseInt(e.target.value))} value={currNationality}>
                 {nationalityName.map((nationality, index) => (
-                  <option value={nationality} key={index}>{nationality}</option>
+                  <option value={index} key={index}>{nationality}</option>
                 ))}
               </select>
             </div>
@@ -260,6 +302,8 @@ function Filter() {
                 <input
                   type="radio"
                   name="radio"
+                  checked={gender === "1"}
+                  onChange={(e) => setGender(e.target.value)}
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
                   value="1"
                 />
@@ -270,6 +314,8 @@ function Filter() {
                 <input
                   type="radio"
                   name="radio"
+                  checked={gender === "1"}
+                  onChange={(e) => setGender(e.target.value)}
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
                   value="2"
                 />
@@ -284,12 +330,12 @@ function Filter() {
             <span className="text-primary font-semibold mt-5">Age</span>
             <div className="w-full h-[2px] bg-[#25AE88]"></div>
 
-            <input type="range" id="points" name="points" min="0" max="40" className="mt-5 w-full" value={age} onChange={(e) => setAge(e.target.value)}></input>
+            <input type="range" id="points" name="points" min="18" max="40" className="mt-5 w-full" value={age} onChange={(e) => setAge(e.target.value)}></input>
 
             <div className="flex flex-col gap-3 mt-3">
               <span className="text-primary text-lg font-semibold">Helper Name</span>
               <div className="border-[1px] w-full border-[#9999] rounded flex justify-between items-center pr-5">
-                <input type="text" placeholder="Search with Helper Name" className=" p-2  text-sm text-secondary outline-none" value={helperName} onChange={(e) => setHelperName(e.target.value)} />
+                <input type="text" placeholder="Search with Helper Name" className=" p-2  text-sm text-secondary outline-none" value={helperName} onChange={(e) => setHelperName(e.target.value) }/>
                 <IoSearchOutline className="text-[#3a3a3a99] h-5 w-5" />
               </div>
             </div>
