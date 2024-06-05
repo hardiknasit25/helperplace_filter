@@ -1,5 +1,5 @@
 import logo from "../../assets/helperplace_logo.svg";
-import { Link, NavLink } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 function Header() {
   const option = [
