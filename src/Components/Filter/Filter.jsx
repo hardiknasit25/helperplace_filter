@@ -1,15 +1,13 @@
 import { MdOutlineRefresh } from "react-icons/md";
 import { IoSearchOutline } from "react-icons/io5";
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import SelectBox from "../SelectFiled/SelectBox";
-import { Slider } from "@mui/material";
+import { FormControl, MenuItem, Select, Slider } from "@mui/material";
 
 function Filter() {
 
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [isInitialRender, setIsInitialRender] = useState(true);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [data, setData] = useState([]);
   const [lang, setLang] = useState([]);
@@ -24,56 +22,55 @@ function Filter() {
   const [currlanguage, setCurrLanguage] = useState([]);
   const [currContract, setCurrContract] = useState([]);
   const [currLocation, setCurrLocation] = useState([]);
-  const [currDate, setDate] = useState("");
+  const [currDate, setDate] = useState(null);
   const [age, setAge] = useState([18, 60])
   const [experience, setExperience] = useState([0, 40]);
   const [jobPosition, setJobPosition] = useState("");
   const [jobType, setJobType] = useState("");
   const [resumeby, setResumeBy] = useState("");
   const [gender, setGender] = useState("");
-  const Country = currLocation.join(',');
 
-  console.log("Skill is : ", currskill);
+  // console.log("Skill is : ", currskill);
 
-  useEffect(() => {
+  // useEffect(() => {
 
-    if (isInitialRender) {
-      setIsInitialRender(false);
-      return;
-    }
+  //   if (isInitialRender) {
+  //     setIsInitialRender(false);
+  //     return;
+  //   }
 
-    const urlParams = new URLSearchParams();
-    urlParams.set('start', "0")
-    urlParams.set('length', "20")
-    urlParams.set('helper_name', helperName)
-    urlParams.set("start_date", currDate)
-    urlParams.set("job_type_id", jobType)
-    urlParams.set("country_id", Country)
-    urlParams.set("position_id", jobPosition)
-    urlParams.set('nationality_id', currNationality)
-    urlParams.set('edu_id', currNationality)
-    urlParams.set('contract_status_id', currContract)
-    urlParams.set('resume_manager', resumeby)
-    urlParams.set('gender', gender)
-    if (currskill > "0") {
-      urlParams.set('skill_id', currskill)
-    }
-    urlParams.set('age_min', age[0])
-    urlParams.set('age_max', age[1])
-    urlParams.set('experience_min', experience[0])
-    urlParams.set('experience_max', experience[1])
-    urlParams.set('marital_status', currContract)
-    urlParams.set('order_by', "last_active")
-    urlParams.set('location_order', "0")
-    urlParams.set('lang', navigator.languages[2])
-    const searchQuery = urlParams.toString();
-    console.log("SearchQuery : ", searchQuery);
+  //   const urlParams = new URLSearchParams();
+  //   urlParams.set('start', "0")
+  //   urlParams.set('length', "20")
+  //   urlParams.set('helper_name', helperName)
+  //   urlParams.set("start_date", currDate)
+  //   urlParams.set("job_type_id", jobType)
+  //   urlParams.set("country_id", Country)
+  //   urlParams.set("position_id", jobPosition)
+  //   urlParams.set('nationality_id', currNationality)
+  //   urlParams.set('edu_id', currNationality)
+  //   urlParams.set('contract_status_id', currContract)
+  //   urlParams.set('resume_manager', resumeby)
+  //   urlParams.set('gender', gender)
+  //   if (currskill > "0") {
+  //     urlParams.set('skill_id', currskill)
+  //   }
+  //   urlParams.set('age_min', age[0])
+  //   urlParams.set('age_max', age[1])
+  //   urlParams.set('experience_min', experience[0])
+  //   urlParams.set('experience_max', experience[1])
+  //   urlParams.set('marital_status', currContract)
+  //   urlParams.set('order_by', "last_active")
+  //   urlParams.set('location_order', "0")
+  //   urlParams.set('lang', navigator.languages[2])
+  //   const searchQuery = urlParams.toString();
+  //   // console.log("SearchQuery : ", searchQuery);
 
-    navigate({
-      pathname: location.pathname,
-      search: `?${searchQuery}`
-    });
-  }, [helperName, currNationality, currlanguage, currContract, currLocation, currDate, currskill, age, experience, jobType, jobPosition, gender, resumeby, navigate, isInitialRender, location.pathname]);
+  //   // navigate({
+  //   //   pathname: location.pathname,
+  //   //   search: `?${searchQuery}`
+  //   // });
+  // }, [helperName, currNationality, currlanguage, currContract, currLocation, currDate, currskill, age, experience, jobType, jobPosition, gender, resumeby, navigate, isInitialRender, location.pathname]);
 
   useEffect(() => {
     fetch("/api/mobile/masterdata/GetAllMasterDataJson")
@@ -105,11 +102,11 @@ function Filter() {
 
   const handleOnReset = () => {
     setHelperName("");
-    setCurrContract("");
-    setCurrLanguage("");
+    setCurrContract([]);
+    setCurrLanguage([]);
     setCurrLocation([]);
     setCurrNationality("");
-    setCurrSkill("");
+    setCurrSkill([]);
     setDate("");
     setAge("30");
     setExperience("30");
@@ -117,11 +114,32 @@ function Filter() {
     setJobType("")
     setResumeBy("")
     setGender("")
+    setSearchParams("")
   }
 
-  const handleOnSubmit = (e) => {
-    e.preventDefault();
-    console.log(helperName);
+  const handleOnInputChange = (field, value) => {
+
+    const urlParams = new URLSearchParams();
+
+    if (value.trim() !== '') {
+      if (field === 'skills') {
+        urlParams.set(field, value.split(', '));
+      } else {
+        urlParams.set(field, value);
+      }
+    }
+
+    searchParams.forEach((paramValue, paramName) => {
+      if (paramName !== field) {
+        if (paramName === 'skills') {
+          urlParams.append(paramName, searchParams.getAll(paramName).join(', '));
+        } else {
+          urlParams.append(paramName, paramValue);
+        }
+      }
+    });
+
+    setSearchParams(urlParams);
   }
 
   return (
@@ -155,7 +173,10 @@ function Filter() {
                   type="radio"
                   name="jobposition"
                   checked={jobPosition === "1"}
-                  onChange={(e) => setJobPosition(e.target.value)}
+                  onChange={(e) => {
+                    setJobPosition(e.target.value);
+                    handleOnInputChange("job_position", "Domestic-Helper")
+                  }}
                   className={`form-radio h-5 w-5 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer ${jobPosition === "1" ? 'bg-green-500' : 'bg-blue-600'}`}
                   value="1"
                 />
@@ -167,7 +188,10 @@ function Filter() {
                   type="radio"
                   name="jobposition"
                   checked={jobPosition === "2"}
-                  onChange={(e) => setJobPosition(e.target.value)}
+                  onChange={(e) => {
+                    setJobPosition(e.target.value);
+                    handleOnInputChange("job_position", "Driver")
+                  }}
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
                   value="2"
                 />
@@ -178,7 +202,14 @@ function Filter() {
 
             <div className="flex flex-col gap-3 mt-3">
               <span className="text-primary text-lg font-semibold">Start Date</span>
-              <input type="date" className="border-[1px] border-[#9999] p-2 rounded text-sm text-secondary outline-none" onChange={(e) => setDate(e.target.value)} />
+              <input
+                type="date"
+                className="border-[1px] border-[#9999] p-2 rounded text-sm text-secondary outline-none"
+                onChange={(e) => {
+                  setDate(e.target.value)
+                  handleOnInputChange("start_date", e.target.value)
+                }}
+              />
             </div>
 
             <div className="flex flex-col gap-3 mt-3">
@@ -187,11 +218,11 @@ function Filter() {
                 currValue={currLocation}
                 setCurrValue={setCurrLocation}
                 valueArray={jobLocation}
+                handleOnChange={(value) => handleOnInputChange("location", value)}
               />
             </div>
 
           </div>
-
 
           {/* job type  */}
           <div className="mt-5 p-2">
@@ -204,7 +235,10 @@ function Filter() {
                   type="radio"
                   name="jobtype"
                   checked={jobType === "1"}
-                  onChange={(e) => setJobType(e.target.value)}
+                  onChange={(e) => {
+                    setJobType(e.target.value);
+                    handleOnInputChange("job_type", "Full-Time")
+                  }}
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
                   value="1"
                 />
@@ -216,7 +250,10 @@ function Filter() {
                   type="radio"
                   name="jobtype"
                   checked={jobType === "2"}
-                  onChange={(e) => setJobType(e.target.value)}
+                  onChange={(e) => {
+                    setJobType(e.target.value);
+                    handleOnInputChange("job_type", "Part-Time")
+                  }}
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
                   value="2"
                 />
@@ -228,7 +265,10 @@ function Filter() {
                   type="radio"
                   name="jobtype"
                   checked={jobType === "3"}
-                  onChange={(e) => setJobType(e.target.value)}
+                  onChange={(e) => {
+                    setJobType(e.target.value);
+                    handleOnInputChange("job_type", "Temporary")
+                  }}
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
                   value="3"
                 />
@@ -243,34 +283,10 @@ function Filter() {
                 currValue={currContract}
                 setCurrValue={setCurrContract}
                 valueArray={contractStatus}
+                handleOnChange={(value) => handleOnInputChange("contract_status", value)}
               />
             </div>
 
-
-
-            {/* <div className="flex flex-col gap-3 mt-3">
-              <span className="text-primary text-lg font-semibold">Contranct Status</span>
-
-              <FormControl className="w-full">
-                <Select
-                  className="w-full h-10 font-popins"
-                  labelId="demo-multiple-checkbox-label"
-                  id="demo-multiple-checkbox"
-                  multiple
-                  value={currContract}
-                  onChange={(e) => setCurrContract(e.target.value)}
-                  style={{ color: "grey", fontFamily: "poppins", fontStyle: "thin" }}
-                  renderValue={(selected) => selected.join(', ')}
-                >
-                  {contractStatus.map((name, index) => (
-                    <MenuItem key={index} value={name}>
-                      <Checkbox checked={currContract.indexOf(name) > -1} />
-                      <ListItemText primary={name} />
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </div> */}
           </div>
 
           {/* Resume By */}
@@ -284,7 +300,11 @@ function Filter() {
                   type="radio"
                   name="resumby"
                   checked={resumeby === "1"}
-                  onChange={(e) => setResumeBy(e.target.value)}
+                  onChange={(e) => {
+                    setResumeBy(e.target.value)
+                    handleOnInputChange("resumeby", "Direct")
+                  }
+                  }
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
                   value="1"
                 />
@@ -296,7 +316,11 @@ function Filter() {
                   type="radio"
                   name="resumby"
                   checked={resumeby === "2"}
-                  onChange={(e) => setResumeBy(e.target.value)}
+                  onChange={(e) => {
+                    setResumeBy(e.target.value)
+                    handleOnInputChange("resumeby", "Agency")
+                  }
+                  }
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
                   value="2"
                 />
@@ -312,8 +336,9 @@ function Filter() {
 
             <div className="mt-2 p-3">
               <Slider
+                getAriaLabel={() => 'Temperature range'}
                 value={experience}
-                onChange={(e, newValue) => setExperience(newValue)}
+                onChange={(e,nextValue) => setExperience(nextValue)}
                 valueLabelDisplay="auto"
                 min={0}
                 max={40}
@@ -326,6 +351,7 @@ function Filter() {
                 currValue={currlanguage}
                 setCurrValue={setCurrLanguage}
                 valueArray={lang}
+                handleOnChange={(value) => handleOnInputChange("language", value)}
               />
             </div>
 
@@ -336,16 +362,36 @@ function Filter() {
                 currValue={currskill}
                 setCurrValue={setCurrSkill}
                 valueArray={skill}
+                handleOnChange={(value) => handleOnInputChange("Main_Skill", value)}
               />
             </div>
 
             <div className="flex flex-col gap-3 mt-3">
               <span className="text-primary text-lg font-semibold">Nationality</span>
-              <select className="border-[0.5px] border-[#9999] p-2 rounded text-sm text-secondary outline-none bg-transparent" onChange={(e) => setCurrNationality(parseInt(e.target.value))} value={currNationality}>
-                {nationalityName.map((nationality, index) => (
-                  <option value={index} key={index}>{nationality}</option>
-                ))}
-              </select>
+
+              <FormControl className="w-full">
+                <Select
+                  labelId="demo-multiple-name-label"
+                  id="demo-multiple-name"
+                  value={currNationality}
+                  onChange={(e) => {
+                    setCurrNationality(e.target.value)
+                    handleOnInputChange("nationality", e.target.value)
+                  }}
+                  className="w-full h-10"
+                  style={{ color: "grey", fontFamily: "poppins", fontStyle: "thin", backgroundColor: "trnsperant", flex: "auto" }}
+                >
+                  {nationalityName.map((name) => (
+                    <MenuItem
+                      key={name}
+                      value={name}
+                      style={{ fontFamily: "poppins" }}
+                    >
+                      {name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </div>
 
           </div>
@@ -362,7 +408,11 @@ function Filter() {
                   type="radio"
                   name="gender"
                   checked={gender === "1"}
-                  onChange={(e) => setGender(e.target.value)}
+                  onChange={(e) => {
+                    setGender(e.target.value)
+                    handleOnInputChange("gender", "Male")
+                  }
+                  }
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
                   value="1"
                 />
@@ -374,7 +424,11 @@ function Filter() {
                   type="radio"
                   name="gender"
                   checked={gender === "2"}
-                  onChange={(e) => setGender(e.target.value)}
+                  onChange={(e) => {
+                    setGender(e.target.value)
+                    handleOnInputChange("gender", "Female")
+                  }
+                  }
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
                   value="2"
                 />
@@ -401,10 +455,15 @@ function Filter() {
 
             <div className="flex flex-col gap-3">
               <span className="text-primary text-lg font-semibold">Helper Name</span>
-              <form onSubmit={handleOnSubmit} className="border-[1px] w-full border-[#9999] rounded flex justify-between items-center pr-5">
-                <input type="text" placeholder="Search with Helper Name" className=" p-2  text-sm text-secondary outline-none" value={helperName} onChange={(e) => setHelperName(e.target.value)} />
+              <div className="border-[1px] w-full border-[#9999] rounded flex justify-between items-center pr-5">
+                <input type="text" placeholder="Search with Helper Name" className=" p-2  text-sm text-secondary outline-none" value={helperName} onChange={(e) => {
+                  setHelperName(e.target.value)
+                  handleOnInputChange("helper_Name", e.target.value)
+                }
+                }
+                />
                 <IoSearchOutline className="text-[#3a3a3a99] h-5 w-5" />
-              </form>
+              </div>
             </div>
 
           </div>
