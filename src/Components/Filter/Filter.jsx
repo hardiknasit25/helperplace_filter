@@ -1,11 +1,16 @@
 import { MdOutlineRefresh } from "react-icons/md";
 import { IoSearchOutline } from "react-icons/io5";
-import { useEffect, useState } from "react"; 
-// import { useHistory } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useLocation } from 'react-router-dom';
+import SelectBox from "../SelectFiled/SelectBox";
+import { Slider } from "@mui/material";
 
 function Filter() {
 
-  // const history = useHistory()
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isInitialRender, setIsInitialRender] = useState(true);
+
   const [data, setData] = useState([]);
   const [lang, setLang] = useState([]);
   const [contractStatus, setContractStatus] = useState([]);
@@ -15,20 +20,30 @@ function Filter() {
 
   const [helperName, setHelperName] = useState("");
   const [currNationality, setCurrNationality] = useState("");
-  const [currskill, setCurrSkill] = useState("");
-  const [currlanguage, setCurrLanguage] = useState("");
-  const [currContract, setCurrContract] = useState("");
-  const [currLocation, setCurrLocation] = useState("");
+  const [currskill, setCurrSkill] = useState([]);
+  const [currlanguage, setCurrLanguage] = useState([]);
+  const [currContract, setCurrContract] = useState([]);
+  const [currLocation, setCurrLocation] = useState([]);
   const [currDate, setDate] = useState("");
-  const [age, setAge] = useState("0")
-  const [experience, setExperience] = useState("30");
+  const [age, setAge] = useState([18, 60])
+  const [experience, setExperience] = useState([0, 40]);
   const [jobPosition, setJobPosition] = useState("");
   const [jobType, setJobType] = useState("");
   const [resumeby, setResumeBy] = useState("");
   const [gender, setGender] = useState("");
 
+  console.log("CurrLocation is : ", currLocation);
+
   useEffect(() => {
+
+    if (isInitialRender) {
+      setIsInitialRender(false);
+      return;
+    }
+
     const urlParams = new URLSearchParams();
+    urlParams.set('start', "0")
+    urlParams.set('length', "20")
     urlParams.set('helper_name', helperName)
     urlParams.set("start_date", currDate)
     urlParams.set("job_type_id", jobType)
@@ -39,20 +54,25 @@ function Filter() {
     urlParams.set('contract_status_id', currContract)
     urlParams.set('resume_manager', resumeby)
     urlParams.set('gender', gender)
-    urlParams.set('skill_id', currskill)
-    urlParams.set('age_min', "18")
-    urlParams.set('age_max', age)
-    urlParams.set('experience_min', "0")
-    urlParams.set('experience_max', experience)
+    if (currskill > "0") {
+      urlParams.set('skill_id', currskill)
+    }
+    urlParams.set('age_min', age[0])
+    urlParams.set('age_max', age[1])
+    urlParams.set('experience_min', experience[0])
+    urlParams.set('experience_max', experience[1])
     urlParams.set('marital_status', currContract)
-    urlParams.set('order_by', currContract)
-    urlParams.set('location_order', currContract)
-    urlParams.set('lang', currlanguage)
+    urlParams.set('order_by', "last_active")
+    urlParams.set('location_order', "0")
+    urlParams.set('lang', navigator.languages[2])
     const searchQuery = urlParams.toString();
-    console.log("SearchQuery : ", searchQuery);
-  }, [setHelperName, currNationality, currlanguage, currContract, currLocation, setDate, currskill, age, experience, jobType, jobPosition, gender, resumeby]);
-  // history.push(`/candidates?${searchQuery}`);
+    // console.log("SearchQuery : ", searchQuery);
 
+    navigate({
+      pathname: location.pathname,
+      search: `?${searchQuery}`
+    });
+  }, [helperName, currNationality, currlanguage, currContract, currLocation, currDate, currskill, age, experience, jobType, jobPosition, gender, resumeby, navigate, isInitialRender, location.pathname]);
 
   useEffect(() => {
     fetch("/api/mobile/masterdata/GetAllMasterDataJson")
@@ -80,18 +100,37 @@ function Filter() {
         }
       })
       .catch(error => console.error('Fetch error:', error));
-  }, []);
+  }, [])
+
+  // const handleChange = (event) => {
+  //   const {
+  //     target: { value },
+  //   } = event;
+  //   setCurrLocation(
+  //     // On autofill we get a stringified value.
+  //     typeof value === 'string' ? value.split(',') : value,
+  //   );
+  // };
 
   const handleOnReset = () => {
     setHelperName("");
     setCurrContract("");
     setCurrLanguage("");
-    setCurrLocation("");
+    setCurrLocation([]);
     setCurrNationality("");
     setCurrSkill("");
     setDate("");
     setAge("30");
     setExperience("30");
+    setJobPosition("")
+    setJobType("")
+    setResumeBy("")
+    setGender("")
+  }
+
+  const handleOnSubmit = (e) => {
+    e.preventDefault();
+    console.log(helperName);
   }
 
   return (
@@ -123,7 +162,7 @@ function Filter() {
               <div className="flex gap-2 justify-start items-center">
                 <input
                   type="radio"
-                  name="radio"
+                  name="jobposition"
                   checked={jobPosition === "1"}
                   onChange={(e) => setJobPosition(e.target.value)}
                   className={`form-radio h-5 w-5 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer ${jobPosition === "1" ? 'bg-green-500' : 'bg-blue-600'}`}
@@ -135,7 +174,7 @@ function Filter() {
               <div className="flex gap-2 justify-start items-center">
                 <input
                   type="radio"
-                  name="radio"
+                  name="jobposition"
                   checked={jobPosition === "2"}
                   onChange={(e) => setJobPosition(e.target.value)}
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
@@ -153,18 +192,18 @@ function Filter() {
 
             <div className="flex flex-col gap-3 mt-3">
               <span className="text-primary text-lg font-semibold">Candidate Location</span>
-              <select className="border-[1px] border-[#9999] p-2 rounded text-sm text-secondary outline-none" value={currLocation} onChange={(e) => setCurrLocation(parseInt(e.target.value))}>
-                {jobLocation.map((location, index) => (
-                  <option key={index} value={index}>{location}</option>
-                ))}
-              </select>
+              <SelectBox
+                currValue={currLocation}
+                setCurrValue={setCurrLocation}
+                valueArray={jobLocation}
+              />
             </div>
 
           </div>
 
 
           {/* job type  */}
-          <div className="mt-5">
+          <div className="mt-5 p-2">
             <span className="text-primary font-semibold mt-5">Job Type</span>
             <div className="w-full h-[2px] bg-[#25AE88]"></div>
 
@@ -172,7 +211,7 @@ function Filter() {
               <div className="flex gap-2 justify-start items-center">
                 <input
                   type="radio"
-                  name="radio"
+                  name="jobtype"
                   checked={jobType === "1"}
                   onChange={(e) => setJobType(e.target.value)}
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
@@ -184,7 +223,7 @@ function Filter() {
               <div className="flex gap-2 justify-start items-center">
                 <input
                   type="radio"
-                  name="radio"
+                  name="jobtype"
                   checked={jobType === "2"}
                   onChange={(e) => setJobType(e.target.value)}
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
@@ -196,7 +235,7 @@ function Filter() {
               <div className="flex gap-2 justify-start items-center">
                 <input
                   type="radio"
-                  name="radio"
+                  name="jobtype"
                   checked={jobType === "3"}
                   onChange={(e) => setJobType(e.target.value)}
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
@@ -207,19 +246,40 @@ function Filter() {
 
             </div>
 
-            <div className="flex flex-col gap-3 mt-3">
-              <span className="text-primary text-lg font-semibold">Contranct Status</span>
-
-              <select className="border-[1px] border-[#9999] p-2 rounded text-sm text-secondary outline-none" value={currContract} onChange={(e) => setCurrContract(parseInt(e.target.value))}>
-                {contractStatus.map((contract, index) => (
-                  <option key={index} value={index}>{contract}</option>
-                ))}
-              </select>
-
+            <div className="flex flex-col gap-3 mt-3 w-full">
+              <span className="text-primary text-lg font-semibold">Contract Status</span>
+              <SelectBox
+                currValue={currContract}
+                setCurrValue={setCurrContract}
+                valueArray={contractStatus}
+              />
             </div>
 
 
 
+            {/* <div className="flex flex-col gap-3 mt-3">
+              <span className="text-primary text-lg font-semibold">Contranct Status</span>
+
+              <FormControl className="w-full">
+                <Select
+                  className="w-full h-10 font-popins"
+                  labelId="demo-multiple-checkbox-label"
+                  id="demo-multiple-checkbox"
+                  multiple
+                  value={currContract}
+                  onChange={(e) => setCurrContract(e.target.value)}
+                  style={{ color: "grey", fontFamily: "poppins", fontStyle: "thin" }}
+                  renderValue={(selected) => selected.join(', ')}
+                >
+                  {contractStatus.map((name, index) => (
+                    <MenuItem key={index} value={name}>
+                      <Checkbox checked={currContract.indexOf(name) > -1} />
+                      <ListItemText primary={name} />
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div> */}
           </div>
 
           {/* Resume By */}
@@ -231,7 +291,7 @@ function Filter() {
               <div className="flex gap-2 justify-start items-center">
                 <input
                   type="radio"
-                  name="radio"
+                  name="resumby"
                   checked={resumeby === "1"}
                   onChange={(e) => setResumeBy(e.target.value)}
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
@@ -243,7 +303,7 @@ function Filter() {
               <div className="flex gap-2 justify-start items-center">
                 <input
                   type="radio"
-                  name="radio"
+                  name="resumby"
                   checked={resumeby === "2"}
                   onChange={(e) => setResumeBy(e.target.value)}
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
@@ -259,30 +319,38 @@ function Filter() {
             <span className="text-primary font-semibold mt-5">Working Experience</span>
             <div className="w-full h-[2px] bg-[#25AE88]"></div>
 
-            <input type="range" id="points" name="points" min="0" max="40" className="mt-5 w-full" value={experience} onChange={(e) => setExperience(e.target.value)}></input>
+            <div className="mt-2 p-3">
+              <Slider
+                value={experience}
+                onChange={(e, newValue) => setExperience(newValue)}
+                valueLabelDisplay="auto"
+                min={0}
+                max={40}
+              />
+            </div>
 
-            <div className="flex flex-col gap-3 mt-3">
+            <div className="flex flex-col gap-3 w-full">
               <span className="text-primary text-lg font-semibold">Language</span>
-              <select className="border-[1px] border-[#9999] p-2 rounded text-sm text-secondary outline-none" value={currlanguage} onChange={(e) => setCurrLanguage(parseInt(e.target.value))}>
-                {lang.map((language, index) => (
-                  <option key={index} value={index}>{language}</option>
-                ))}
-              </select>
+              <SelectBox
+                currValue={currlanguage}
+                setCurrValue={setCurrLanguage}
+                valueArray={lang}
+              />
             </div>
 
 
-            <div className="flex flex-col gap-3 mt-3">
-              <span className="text-primary text-lg font-semibold">Main Skills</span>
-              <select className="border-[1px] border-[#9999] p-2 rounded text-sm text-secondary outline-none" value={currskill} onChange={(e) => setCurrSkill(parseInt(e.target.value))}>
-                {skill.map((skill_name, index) => (
-                  <option value={index} key={index}>{skill_name}</option>
-                ))}
-              </select>
+            <div className="flex flex-col gap-3 mt-3 w-full">
+              <span className="text-primary text-lg font-semibold">Main Skill</span>
+              <SelectBox
+                currValue={currskill}
+                setCurrValue={setCurrSkill}
+                valueArray={skill}
+              />
             </div>
 
             <div className="flex flex-col gap-3 mt-3">
               <span className="text-primary text-lg font-semibold">Nationality</span>
-              <select className="border-[1px] border-[#9999] p-2 rounded text-sm text-secondary outline-none" onChange={(e) => setCurrNationality(parseInt(e.target.value))} value={currNationality}>
+              <select className="border-[0.5px] border-[#9999] p-2 rounded text-sm text-secondary outline-none bg-transparent" onChange={(e) => setCurrNationality(parseInt(e.target.value))} value={currNationality}>
                 {nationalityName.map((nationality, index) => (
                   <option value={index} key={index}>{nationality}</option>
                 ))}
@@ -301,7 +369,7 @@ function Filter() {
               <div className="flex gap-2 justify-start items-center">
                 <input
                   type="radio"
-                  name="radio"
+                  name="gender"
                   checked={gender === "1"}
                   onChange={(e) => setGender(e.target.value)}
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
@@ -313,8 +381,8 @@ function Filter() {
               <div className="flex gap-2 justify-start items-center">
                 <input
                   type="radio"
-                  name="radio"
-                  checked={gender === "1"}
+                  name="gender"
+                  checked={gender === "2"}
                   onChange={(e) => setGender(e.target.value)}
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
                   value="2"
@@ -330,14 +398,22 @@ function Filter() {
             <span className="text-primary font-semibold mt-5">Age</span>
             <div className="w-full h-[2px] bg-[#25AE88]"></div>
 
-            <input type="range" id="points" name="points" min="18" max="40" className="mt-5 w-full" value={age} onChange={(e) => setAge(e.target.value)}></input>
+            <div className="mt-3 w-full p-3">
+              <Slider
+                value={age}
+                onChange={(e, newValue) => setAge(newValue)}
+                valueLabelDisplay="auto"
+                min={18}
+                max={60}
+              />
+            </div>
 
-            <div className="flex flex-col gap-3 mt-3">
+            <div className="flex flex-col gap-3">
               <span className="text-primary text-lg font-semibold">Helper Name</span>
-              <div className="border-[1px] w-full border-[#9999] rounded flex justify-between items-center pr-5">
-                <input type="text" placeholder="Search with Helper Name" className=" p-2  text-sm text-secondary outline-none" value={helperName} onChange={(e) => setHelperName(e.target.value) }/>
+              <form onSubmit={handleOnSubmit} className="border-[1px] w-full border-[#9999] rounded flex justify-between items-center pr-5">
+                <input type="text" placeholder="Search with Helper Name" className=" p-2  text-sm text-secondary outline-none" value={helperName} onChange={(e) => setHelperName(e.target.value)} />
                 <IoSearchOutline className="text-[#3a3a3a99] h-5 w-5" />
-              </div>
+              </form>
             </div>
 
           </div>
