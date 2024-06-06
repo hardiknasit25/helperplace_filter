@@ -31,8 +31,9 @@ function Filter() {
   const [jobType, setJobType] = useState("");
   const [resumeby, setResumeBy] = useState("");
   const [gender, setGender] = useState("");
+  const Country = currLocation.join(',');
 
-  console.log("CurrLocation is : ", currLocation);
+  console.log("Skill is : ", currskill);
 
   useEffect(() => {
 
@@ -47,7 +48,7 @@ function Filter() {
     urlParams.set('helper_name', helperName)
     urlParams.set("start_date", currDate)
     urlParams.set("job_type_id", jobType)
-    urlParams.set("country_id", currLocation)
+    urlParams.set("country_id", Country)
     urlParams.set("position_id", jobPosition)
     urlParams.set('nationality_id', currNationality)
     urlParams.set('edu_id', currNationality)
@@ -66,7 +67,7 @@ function Filter() {
     urlParams.set('location_order', "0")
     urlParams.set('lang', navigator.languages[2])
     const searchQuery = urlParams.toString();
-    // console.log("SearchQuery : ", searchQuery);
+    console.log("SearchQuery : ", searchQuery);
 
     navigate({
       pathname: location.pathname,
@@ -101,16 +102,6 @@ function Filter() {
       })
       .catch(error => console.error('Fetch error:', error));
   }, [])
-
-  // const handleChange = (event) => {
-  //   const {
-  //     target: { value },
-  //   } = event;
-  //   setCurrLocation(
-  //     // On autofill we get a stringified value.
-  //     typeof value === 'string' ? value.split(',') : value,
-  //   );
-  // };
 
   const handleOnReset = () => {
     setHelperName("");

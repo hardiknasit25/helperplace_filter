@@ -18,18 +18,15 @@ function SelectBox({ currValue, setCurrValue, valueArray, }) {
     <FormControl className='w-full'>
       <Select
         className="w-full h-10 font-popins"
-        labelId="demo-multiple-checkbox-label"
-        id="demo-multiple-checkbox"
         multiple
         value={currValue}
         onChange={(e) => setCurrValue(e.target.value)}
-        placeholder='hello'
-        style={{ color: "grey", fontFamily: "poppins", fontStyle: "thin", backgroundColor: "trnsperant", flex: "auto"}}
-        renderValue={(selected) => selected.join(', ')}
+        style={{ color: "grey", fontFamily: "poppins", fontStyle: "thin", backgroundColor: "trnsperant", flex: "auto" }}
+        renderValue={(selected) => selected.map(index => valueArray[index]).join(', ')}
       >
         {valueArray.map((name, index) => (
-          <MenuItem key={index} value={name}>
-            <Checkbox checked={currValue.indexOf(name) > -1} />
+          <MenuItem key={index} value={index}>
+            <Checkbox checked={currValue.indexOf(index) > -1} />
             <ListItemText primary={name} />
           </MenuItem>
         ))}
