@@ -11,7 +11,7 @@ function Header() {
     {
       id: "2",
       name: "CANDIDATES",
-      path: "candidates"
+      path: "find-candidates"
     },
     {
       id: "3",

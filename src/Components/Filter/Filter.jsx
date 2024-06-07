@@ -108,8 +108,8 @@ function Filter() {
     setCurrNationality("");
     setCurrSkill([]);
     setDate("");
-    setAge("30");
-    setExperience("30");
+    setAge([18, 60]);
+    setExperience([0, 40]);
     setJobPosition("")
     setJobType("")
     setResumeBy("")
@@ -121,26 +121,112 @@ function Filter() {
 
     const urlParams = new URLSearchParams();
 
-    if (value.trim() !== '') {
-      if (field === 'skills') {
-        urlParams.set(field, value.split(', '));
-      } else {
-        urlParams.set(field, value);
-      }
+    if (Array.isArray(value) && value.length > 0) {
+      urlParams.set(field, value.join(', '));
+    } else if (typeof value === 'string' && value.trim() !== '') {
+      urlParams.set(field, value.trim());
+    }
+    // else if (field === 'age' && Array.isArray(value) && value.length === 2) {
+    //   // If field is 'age' and value is an array with two elements, set 'age_min' and 'age_max' parameters
+    //   urlParams.set('age_min', value[0]);
+    //   urlParams.set('age_max', value[1]);
+    // } 
+    else {
+      // If value is empty, remove the field from the URL
+      urlParams.delete(field);
     }
 
     searchParams.forEach((paramValue, paramName) => {
       if (paramName !== field) {
         if (paramName === 'skills') {
-          urlParams.append(paramName, searchParams.getAll(paramName).join(', '));
+          // Ensure 'skills' parameter is added as a comma-separated string
+          const skillsValues = searchParams.getAll(paramName);
+          if (skillsValues.length > 0) {
+            urlParams.append(paramName, skillsValues.join(','));
+          }
         } else {
           urlParams.append(paramName, paramValue);
         }
       }
     });
 
-    setSearchParams(urlParams);
+    setSearchParams(urlParams.toString());
   }
+
+  // const handleOnInputChange = (field, value) => {
+  //   const params = {};
+
+  //   if (Array.isArray(value) && value.length > 0) {
+  //     params[field] = value.join(', ');
+  //   } else if (typeof value === 'string' && value.trim() !== '') {
+  //     params[field] = value.trim();
+  //   }
+  //    else if (field === 'age' && Array.isArray(value) && value.length === 2) {
+  //     // If field is 'age' and value is an array with two elements, set 'age_min' and 'age_max' parameters
+  //     params['age_min'] = value[0];
+  //     params['age_max'] = value[1];
+  //   }
+
+  //   // Add other parameters from searchParams
+  //   searchParams.forEach((paramValue, paramName) => {
+  //     if (paramName !== field) {
+  //       params[paramName] = paramValue;
+  //     }
+  //   });
+
+  //   // Construct the query string
+  //   let queryString = '';
+  //   for (const key in params) {
+  //     if (params.hasOwnProperty(key)) {
+  //       queryString += `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}&`;
+  //     }
+  //   }
+  //   queryString = queryString.slice(0, -1); // Remove the trailing '&'
+
+  //   // Update the URL search parameters
+  //   setSearchParams(queryString);
+  // }
+
+
+  // const handleOnInputChange = (field, value) => {
+  //   // Parse the current search parameters into an object
+  //   const params = {};
+  //   const searchParams = window.location.search.substring(1).split('&');
+
+  //   // Populate the params object with the current search parameters
+  //   for (const param of searchParams) {
+  //     const [key, val] = param.split('=');
+  //     params[key] = val ? decodeURIComponent(val.replace(/\+/g, ' ')) : '';
+  //   }
+
+  //   // Update the value for the specified field
+  //   if (Array.isArray(value) && value.length > 0) {
+  //     params[field] = value.join(',');
+  //   } else if (typeof value === 'string' && value.trim() !== '') {
+  //     if (field === 'language') {
+  //       params[field] = value.split(',').map(item => item.trim()).join(',');
+  //     } else {
+  //       params[field] = value.trim();
+  //     }
+  //   } else {
+  //     // If value is empty, remove the field
+  //     delete params[field];
+  //   }
+
+  //   // Construct the new search string
+  //   const searchString = Object.entries(params)
+  //     .map(([key, val]) => `${encodeURIComponent(key)}=${encodeURIComponent(val)}`)
+  //     .join('&');
+
+  //   // Update the URL with the new search string
+  //   window.history.replaceState({}, '', `${window.location.pathname}?${searchString}`);
+  // };
+
+
+
+
+
+
 
   return (
     <div className="w-[30%] rounded-md ps-[15px] pr-[15px] mt-10 pb-5 border-[1px] border-[#9999] bg-[#F9F9F9]">
@@ -218,7 +304,7 @@ function Filter() {
                 currValue={currLocation}
                 setCurrValue={setCurrLocation}
                 valueArray={jobLocation}
-                handleOnChange={(value) => handleOnInputChange("location", value)}
+                handleOnChange={(value) => handleOnInputChange("country", value)}
               />
             </div>
 
@@ -302,7 +388,7 @@ function Filter() {
                   checked={resumeby === "1"}
                   onChange={(e) => {
                     setResumeBy(e.target.value)
-                    handleOnInputChange("resumeby", "Direct")
+                    handleOnInputChange("post_manager", "Direct")
                   }
                   }
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
@@ -318,7 +404,7 @@ function Filter() {
                   checked={resumeby === "2"}
                   onChange={(e) => {
                     setResumeBy(e.target.value)
-                    handleOnInputChange("resumeby", "Agency")
+                    handleOnInputChange("post_manager", "Agency")
                   }
                   }
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
@@ -338,7 +424,10 @@ function Filter() {
               <Slider
                 getAriaLabel={() => 'Temperature range'}
                 value={experience}
-                onChange={(e,nextValue) => setExperience(nextValue)}
+                onChange={(e, nextValue) => {
+                  setExperience(nextValue)
+                  handleOnInputChange("experience_range", nextValue)
+                }}
                 valueLabelDisplay="auto"
                 min={0}
                 max={40}
@@ -351,7 +440,10 @@ function Filter() {
                 currValue={currlanguage}
                 setCurrValue={setCurrLanguage}
                 valueArray={lang}
-                handleOnChange={(value) => handleOnInputChange("language", value)}
+                handleOnChange={(value) => {
+                  console.log("value is :", value);
+                  handleOnInputChange("Language", value)
+                }}
               />
             </div>
 
@@ -362,7 +454,7 @@ function Filter() {
                 currValue={currskill}
                 setCurrValue={setCurrSkill}
                 valueArray={skill}
-                handleOnChange={(value) => handleOnInputChange("Main_Skill", value)}
+                handleOnChange={(value) => handleOnInputChange("Main-Skills", value)}
               />
             </div>
 
@@ -395,7 +487,6 @@ function Filter() {
             </div>
 
           </div>
-
 
           {/* Gender  */}
           <div className="mt-5">
@@ -437,7 +528,6 @@ function Filter() {
             </div>
           </div>
 
-
           {/* Age  */}
           <div className="mt-5">
             <span className="text-primary font-semibold mt-5">Age</span>
@@ -446,7 +536,11 @@ function Filter() {
             <div className="mt-3 w-full p-3">
               <Slider
                 value={age}
-                onChange={(e, newValue) => setAge(newValue)}
+                onChange={(e, newValue) => {
+                  setAge(newValue)
+                  console.log(newValue);
+                  handleOnInputChange('age_range', newValue);
+                }}
                 valueLabelDisplay="auto"
                 min={18}
                 max={60}
@@ -458,7 +552,7 @@ function Filter() {
               <div className="border-[1px] w-full border-[#9999] rounded flex justify-between items-center pr-5">
                 <input type="text" placeholder="Search with Helper Name" className=" p-2  text-sm text-secondary outline-none" value={helperName} onChange={(e) => {
                   setHelperName(e.target.value)
-                  handleOnInputChange("helper_Name", e.target.value)
+                  handleOnInputChange("name", e.target.value)
                 }
                 }
                 />
@@ -469,6 +563,7 @@ function Filter() {
           </div>
 
         </div>
+        
       </div>
 
     </div>

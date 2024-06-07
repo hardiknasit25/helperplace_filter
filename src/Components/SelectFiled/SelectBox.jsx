@@ -4,7 +4,6 @@ import ListItemText from '@mui/material/ListItemText';
 import Select from '@mui/material/Select';
 import Checkbox from '@mui/material/Checkbox';
 import PropTypes from 'prop-types';
-import { Label } from 'recharts';
 
 function SelectBox({ currValue, setCurrValue, valueArray, handleOnChange}) {
 
@@ -19,6 +18,7 @@ function SelectBox({ currValue, setCurrValue, valueArray, handleOnChange}) {
     const {
       target: { value },
     } = event;
+    // console.log(event.target);
     setCurrValue(value);
     handleOnChange(value);
   };
@@ -32,11 +32,12 @@ function SelectBox({ currValue, setCurrValue, valueArray, handleOnChange}) {
         value={currValue}
         onChange={handleChange}
         style={{ color: "grey", fontFamily: "poppins", fontStyle: "thin", backgroundColor: "trnsperant", flex: "auto" }}
-        renderValue={(selected) => selected.map(index => valueArray[index]).join(', ')}
+        // renderValue={(selected) => selected.map(index => valueArray[index]).join(', ')}
+        renderValue={(selected) => selected.join(', ')}
       >
         {valueArray.map((name, index) => (
-          <MenuItem key={index} value={index} style={{ fontFamily: "poppins" }}>
-            <Checkbox checked={currValue.indexOf(index) > -1}/>
+          <MenuItem key={index} value={name} style={{ fontFamily: "poppins" }}>
+            <Checkbox checked={currValue.indexOf(name) > -1}/>
             <ListItemText primary={name} style={{ fontFamily: "poppins" }} />
           </MenuItem>
         ))}
