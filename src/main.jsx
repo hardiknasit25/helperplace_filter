@@ -7,6 +7,8 @@ import Candidates from './Components/Candidates/Candidates.jsx'
 import Jobs from './Components/Jobs/Jobs.jsx'
 import Agency from './Components/Agency/Agency.jsx'
 import News from './Components/News/News.jsx'
+import { Provider } from 'react-redux'
+import {store} from '../src/app/store.js'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -20,7 +22,7 @@ const router = createBrowserRouter(
 )
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+  <Provider store={store}>
     <RouterProvider router={router}/>
-  </React.StrictMode>,
+  </Provider>
 )

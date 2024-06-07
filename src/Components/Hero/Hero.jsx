@@ -44,8 +44,10 @@ function Hero() {
       </div>
 
       <div className="w-full h-[37px] flex justify-end mt-4">
-        <FaSortAmountDown className="text-[#25AE88]" />
-        <button className="w-[150px] h-[37px] p-2 bg-[#25AE88] rounded-md text-white font-semibold">Last Active</button>
+        <div className="w-[150px] h-[37px] p-2 bg-[#25AE88] rounded-md text-white font-semibold flex justify-start items-center gap-2">
+          <FaSortAmountDown className="text-white w-4 h-4" />
+          <button className=" text-sm font-semibold">Last Active</button>
+        </div>
       </div>
     </>
   )

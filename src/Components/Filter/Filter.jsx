@@ -4,17 +4,27 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from 'react-router-dom';
 import SelectBox from "../SelectFiled/SelectBox";
 import { FormControl, MenuItem, Select, Slider } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { addData, addLocation, addLanguage, addSkills, addNationality, addContract} from "../../features/dataSlice";
 
 function Filter() {
 
+  const dispatch = useDispatch();
+  const Masterdata = useSelector((state) => state.data)
+  const lang = useSelector((state) => state.Language)
+  const skill = useSelector((state) => state.Skills)
+  const jobLocation = useSelector((state) => state.Locations)
+  const contractStatus = useSelector((state) => state.contract)
+  const nationalityName = useSelector((state) => state.nationality)
+
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [data, setData] = useState([]);
-  const [lang, setLang] = useState([]);
-  const [contractStatus, setContractStatus] = useState([]);
-  const [nationalityName, setNationalityName] = useState([]);
-  const [skill, setSkill] = useState([]);
-  const [jobLocation, setJobLocation] = useState([]);
+  // const [data, setData] = useState([]);
+  // const [lang, setLang] = useState([]);
+  // const [contractStatus, setContractStatus] = useState([]);
+  // const [nationalityName, setNationalityName] = useState([]);
+  // const [skill, setSkill] = useState([]);
+  // const [jobLocation, setJobLocation] = useState([]);
 
   const [helperName, setHelperName] = useState("");
   const [currNationality, setCurrNationality] = useState("");
@@ -25,7 +35,7 @@ function Filter() {
   const [currDate, setDate] = useState(null);
   const [age, setAge] = useState([18, 60])
   const [experience, setExperience] = useState([0, 40]);
-  const [jobPosition, setJobPosition] = useState("");
+  const [jobPosition, setJobPosition] = useState(false);
   const [jobType, setJobType] = useState("");
   const [resumeby, setResumeBy] = useState("");
   const [gender, setGender] = useState("");
@@ -81,18 +91,19 @@ function Filter() {
         return response.json();
       })
       .then(data => {
-        setData(data);
+        // setData(data);
+        dispatch(addData(data))
         if (data && data.data.language && data.data.contract_status && data.data.nationality && data.data.skills && data.data.job_location) {
           const languages = data.data.language.map(language => language.language_name);
           const contract_status = data.data.contract_status.map((contract) => contract.contract_sts_name);
           const nationality = data.data.nationality.map(nationality => nationality.nationality_name)
           const skills = data.data.skills.map(skills => skills.skill_name)
           const jobLocations = data.data.job_location.map(joblocation => joblocation.location_name)
-          setLang(languages);
-          setContractStatus(contract_status)
-          setNationalityName(nationality);
-          setSkill(skills)
-          setJobLocation(jobLocations);
+          dispatch(addLanguage(languages))
+          dispatch(addLocation(jobLocations))
+          dispatch(addSkills(skills))
+          dispatch(addNationality(nationality))
+          dispatch(addContract(contract_status))
         } else {
           console.log("Language data is missing or not an array:", data.languages);
         }

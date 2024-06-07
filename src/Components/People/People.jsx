@@ -1,8 +1,70 @@
 import profile1 from '../../assets/profile1.jpg'
 import { FaCalendarAlt } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
+import { useSearchParams } from 'react-router-dom';
 
 function People() {
+
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  // Assuming queryParams is an instance of URLSearchParams
+  const queryParams = new URLSearchParams(window.location.search);
+
+  // Iterate through each parameter and log its values to the console
+  // queryParams.forEach((value, key) => {
+  //   // If the parameter has multiple values, value will be an array
+  //   if (Array.isArray(value)) {
+  //     console.log(`${key}: ${value.join(', ')}`);
+  //   } else {
+  //     console.log(`${key}: ${value}`);
+  //   }
+  // });
+
+  const job_position = queryParams.get('job_position') || '';
+  const job_type = queryParams.get('job_type') || '';
+  const resumeby = queryParams.get('post_manager') || '';
+  const nationality = queryParams.get('nationality') || '';
+  const gender = queryParams.get('gender') || '';
+  const helper_name = queryParams.get('name') || '';
+  const date = queryParams.get('start_date') || '';
+  const country = queryParams.getAll('country') || [];
+  const experience = queryParams.getAll('experience_range') || [];
+  const age = queryParams.getAll('age_range') || [];
+  const language = queryParams.getAll('Language') || [];
+  const currskill = queryParams.getAll('Main-Skills') || [];
+  const currContract = queryParams.getAll('contract_status') || [];
+
+  console.log("job_position :", job_position);
+  console.log("Date :", date);
+  console.log("job_type :", job_type);
+  console.log("resum : ", resumeby);
+  console.log("nationality : ", nationality);
+  console.log("gender : ", gender);
+  console.log("helperName : ", helper_name);
+  console.log("country : ", country);
+  console.log("experience : ", experience);
+  console.log("age : ", age);
+  console.log("language : ", language);
+  console.log("skills : ", currskill);
+  console.log("contract status : ", currContract);
+
+  // job_position
+  // helperName
+  // currNationality
+  // currlanguage
+  // currContract
+  // currLocation
+  // currDate
+  // currskill
+  // age
+  // experience
+  // jobType
+  // jobPosition
+  // gender
+  // resumeby
+  // navigate
+  // isInitialRender
+  // location.pathname
 
   return (
     <div className="mt-10 w-full">
@@ -21,7 +83,6 @@ function People() {
             <div className='w-full h-[2px] bg-[#EBBA16]'></div>
           </div>
         </div>
-
 
         <div className="p-2 flex flex-col justify-evenly">
           <h4 className="text-primary font-semibold text-[20px]"> Dazel Joy <span>- 36</span></h4>
