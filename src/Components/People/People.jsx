@@ -1,6 +1,5 @@
 // import { useEffect } from 'react';
-import { useEffect, useRef, useState } from 'react';
-import profile1 from '../../assets/profile1.jpg'
+import { useEffect, useState } from 'react';
 import { FaCalendarAlt } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
 import { useSelector } from 'react-redux';
@@ -14,6 +13,8 @@ function People() {
   const Skills = useSelector((state) => state.Skills)
   const contract = useSelector((state) => state.contract)
   const nationalityList = useSelector((state) => state.nationality)
+  const candidateCountry = useSelector((state) => state.candidateCountry)
+  const order = useSelector((state) => state.order)
 
   const [clientData, setClientData] = useState([])
 
@@ -21,28 +22,20 @@ function People() {
     return string.split(',').map(language => language.trim());
   }
 
-  // console.log(Locations);
+  // console.log("search data :",searchData);
 
-//get country name from country code which provided by response from API
-  // const getLocationName = (locationId) => {
-  //   const newLocationId = locationId - 1;
-  //   const location = Locations.map((location,index) => {
-  //     if(index === newLocationId)
-  //       return location;
-  //     else ""
-  //   })
-  //   // return location;
-  //   console.log("Location Name :",location);
-  // };
+  //get Clint Country name from country code which provided by response from API
   const getLocationName = (locationId) => {
-    const newLocationId = locationId - 1;
-    const location = Locations.find((location, index) => index === newLocationId);
-    // console.log("Location Name :", location);
+    const location = candidateCountry.find((item) => item.country_id === locationId);
+    return location ? location.country_name : '';
   };
-  getLocationName(0)
-  // console.log(Locations);
 
-// convert date into short form
+  const getContractName = (contractId) => {
+    const contractName = contract.find((item) => item.contract_sts_id === contractId);
+    return contractName ? contractName.contract_sts_name : '';
+  };
+
+  // convert date into short form
   const getDate = (date) => {
     const originalDate = new Date(date);
     const formattedDate = originalDate.toLocaleDateString("en-GB", {
@@ -62,14 +55,12 @@ function People() {
     // console.log('searchData.language is not defined or empty');
   }
   for (let i = 0; i < languagesArray.length; i++) {
-    for (let j = 0; j < lang.length; j++) {
-      if (languagesArray[i] === lang[j]) {
-        langIndices.push(j + 1);
-        break;
-      }
-    }
+    lang.map((item) => {
+      if (item.language_name === languagesArray[i])
+        langIndices.push(item.language_id)
+    })
   }
-  const serializedLanguageArray = langIndices.join(',');
+  // const serializedLanguageArray = langIndices.join(',');
 
   // covert language into array and get a index**************************  
   let countryArray = []
@@ -80,12 +71,10 @@ function People() {
     // console.log('searchData.country is not defined or empty');
   }
   for (let i = 0; i < countryArray.length; i++) {
-    for (let j = 0; j < Locations.length; j++) {
-      if (countryArray[i] === Locations[j]) {
-        countryIndices.push(j + 1);
-        break;
-      }
-    }
+    Locations.map((item) => {
+      if (item.country_name === countryArray[i])
+        countryIndices.push(item.job_location_id)
+    })
   }
   const serializedCountryArray = countryIndices.join(',');
 
@@ -98,15 +87,12 @@ function People() {
     // console.log('searchData.country is not defined or empty');
   }
   for (let i = 0; i < skillsArray.length; i++) {
-    for (let j = 0; j < Skills.length; j++) {
-      if (skillsArray[i] === Skills[j]) {
-        skillsIndices.push(j + 1);
-        break;
-      }
-    }
+    Skills.map((item) => {
+      if (item.skill_name === skillsArray[i])
+        skillsIndices.push(item.skill_id)
+    })
   }
   const serializedSkillsArray = skillsIndices.join(',');
-
 
   // covert Contract into array and get a index**************************  
   let contractArray = []
@@ -117,25 +103,21 @@ function People() {
     // console.log('searchData.country is not defined or empty');
   }
   for (let i = 0; i < contractArray.length; i++) {
-    for (let j = 0; j < contract.length; j++) {
-      if (contractArray[i] === contract[j]) {
-        contractIndices.push(j + 1);
-        break;
-      }
-    }
+    contract.map((item) => {
+      if (item.contract_sts_name === contractArray[i])
+        contractIndices.push(item.contract_sts_id)
+    })
   }
   const serializedContractArray = contractIndices.join(',');
 
   //find index of nationality 
   let nationalityIndices = "";
-  for (let j = 0; j < nationalityList.length; j++) {
-    if (searchData.nationality === nationalityList[j]) {
-      nationalityIndices = j + 1;
-      break;
-    }
-  }
+  nationalityList.map((item) => {
+    if (item.nationality_name === searchData.nationality)
+      nationalityIndices = item.nationality_id;
+  })
 
-//generate SearchURL 
+  //generate SearchURL 
   const urlParams = new URLSearchParams();
   urlParams.set('start', "0")
   urlParams.set('length', "20")
@@ -167,14 +149,13 @@ function People() {
   urlParams.set('experience_min', searchData.experience[0])
   urlParams.set('experience_max', searchData.experience[1])
   urlParams.set('marital_status', "")
-  urlParams.set('order_by', "last_active")
+  urlParams.set('order_by', order)
   urlParams.set('location_order', "0")
   urlParams.set('lang', navigator.languages[2])
   const searchQuery = urlParams.toString();
   // console.log(searchQuery);
 
-
-//Fetch client data
+  //Fetch client data
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -220,40 +201,41 @@ function People() {
   //   debouncedFetchData();
   // }, [searchQuery]);
 
-
   return (
-    <div className="mt-10 w-full">
+    <div className="w-full mt-16">
 
       {clientData.length > 0 ? clientData.map((client) => (
-        <div className="h-[220px] flex gap-2 shadow-2xl pt-2 pb-2 rounded-md mb-5" key={client.resume_id}>
+        <div className="h-[213px] flex gap-2 shadow-2xl pt-2 pb-2 rounded-md mb-5" style={{boxShadow: "grey"}} key={client.resume_id}>
           {/* Photo  */}
-          < div className="w-[35%] h-fullflex flex-col justify-center items-center" >
-            <div className="h-[80%] w-full flex justify-center items-center">
+          < div className="w-[165px] h-[213px] flex flex-col justify-center items-center gap-3" >
+            <div className="h-[145px] w-[165px] flex justify-center items-center p-1">
               <img src={client.profile_photo} alt='profile_image' className='h-[143px] w-[143px] rounded-full overflow-hidden items-center' />
             </div>
-            <div className="h-[20%] w-full flex flex-col justify-center items-center mt-1">
-              <div style={{ clipPath: 'polygon(0 0, 100% 0, 90% 50%, 100% 100%, 0% 100%)', backgroundColor: "var(--primary-color)" }} color='primary' className='w-full h-[75%] flex justify-center items-center'>
+            <div className="h-[38px] w-[165px] flex flex-col justify-center items-start mt-1">
+              <div style={{ clipPath: 'polygon(0 0, 100% 0, 90% 50%, 100% 100%, 0% 100%)', backgroundColor: "var(--primary-color)" }} color='primary' className='w-[128.45px] h-[30px] flex justify-center items-center'>
                 <p className='text-white font-normal'>{client.resume_manager}</p>
               </div>
-              <div className='w-full h-[2px] bg-[#EBBA16]'></div>
+              <div className='w-[128.45px] h-[2px] bg-[#EBBA16]'></div>
             </div>
           </div>
 
-          <div className="p-2 flex flex-col justify-evenly">
-            <h4 className="text-primary font-semibold text-[20px]"> {client.helper_name} <span>- {client.age}</span></h4>
+          <div className="p-2 flex flex-col">
+            <div className='w-full h-[150px] p-[10px] flex flex-col'>
+              <h4 className="text-primary font-semibold text-[18px]"> {client.helper_name} <span>- {client.age}yr</span></h4>
 
-            <div className="flex gap-5 mt-3">
-              <span className="text-secondary font-semibold text-[16px]">{client.position_id === "1" ? "Domestic Helper" : (client.position_id === 1 ? "Domestic Helper" : "Driver")}
-                <span>- Finished Contract </span></span>
-              <div className='flex justify-center items-center gap-1'>
-                <FaLocationDot className='text-[#25AE88]' />
-                <span className="text-primary font-semibold text-[16px]">{getLocationName(client.current_country_id)}</span>
+              <div className="flex gap-5 mt-2">
+                <span className="text-secondary font-semibold text-[16px]">{client.position_id === "1" ? "Domestic Helper" : (client.position_id === 1 ? "Domestic Helper " : "Driver ")}
+                  <span>- {getContractName(client.contract_status_id)} </span></span>
+                <div className='flex justify-center items-center gap-1'>
+                  <FaLocationDot className='text-[#25AE88]' />
+                  <span className="text-primary font-semibold text-[16px]">{getLocationName(client.current_country_id)}</span>
+                </div>
               </div>
+
+              <span className="mt-2 text-[14px]"> {client.meta_data}</span>
             </div>
 
-            <span className="mt-2 text-[14px]"> {client.meta_data}</span>
-
-            <div className="flex mt-5 gap-14">
+            <div className="flex mt-4 gap-10 h-[30px] justify-start items-center">
               <div className='flex justify-center items-center gap-2'>
                 <div className='w-4 h-4 bg-[#25AE88] rounded-full'></div>
                 <span className="text-primary font-semibold">{client.experience_year}yr experience</span>
@@ -271,7 +253,7 @@ function People() {
             </div>
           </div>
         </div >
-      )) : <NotFound/>}
+      )) : <NotFound />}
     </div>
   )
 }

@@ -7,6 +7,8 @@ const initialState = {
   Skills: [],
   contract: [],
   nationality: [],
+  candidateCountry: [],
+  order: '',
   paramsData: {
     job_position: "",
     job_type: "",
@@ -34,6 +36,8 @@ export const dataSlice = createSlice({
     addSkills: (state, action) => { state.Skills = action.payload },
     addContract: (state, action) => { state.contract = action.payload },
     addNationality: (state, action) => { state.nationality = action.payload },
+    addCandidateCountry: (state, action) => { state.candidateCountry = action.payload },
+    addOrder: (state, action) => { state.order = action.payload },
     addParamsData: (state, action) => {
       state.paramsData = {
         job_position: action.payload.job_position,
@@ -54,6 +58,6 @@ export const dataSlice = createSlice({
   }
 })
 
-export const { addData, addLocation, addLanguage, addSkills, addNationality, addContract, addParamsData } = dataSlice.actions
+export const { addData, addLocation, addLanguage, addSkills, addNationality, addContract, addParamsData, addCandidateCountry, addOrder } = dataSlice.actions
 
 export default dataSlice.reducer

@@ -5,21 +5,22 @@ import { useSearchParams } from 'react-router-dom';
 import SelectBox from "../SelectFiled/SelectBox";
 import { FormControl, MenuItem, Select, Slider } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { addData, addLocation, addLanguage, addSkills, addNationality, addContract, addParamsData } from "../../features/dataSlice";
+import { addData, addLocation, addLanguage, addSkills, addNationality, addContract, addParamsData, addCandidateCountry, addOrder } from "../../features/dataSlice";
+import Order from "../Hero/order";
 
 function Filter() {
 
   const dispatch = useDispatch();
-  // const Masterdata = useSelector((state) => state.data)
   const lang = useSelector((state) => state.Language)
   const skill = useSelector((state) => state.Skills)
   const jobLocation = useSelector((state) => state.Locations)
   const contractStatus = useSelector((state) => state.contract)
   const nationalityName = useSelector((state) => state.nationality)
   const searchData = useSelector((state) => state.paramsData)
+  const order = useSelector((slice) => slice.order);
   const [searchParams, setSearchParams] = useSearchParams();
   const [helperName, setHelperName] = useState(searchData.helper_name);
-  const [currNationality, setCurrNationality] = useState("");
+  const [currNationality, setCurrNationality] = useState('');
   const [currskill, setCurrSkill] = useState([]);
   const [currlanguage, setCurrLanguage] = useState([]);
   const [currContract, setCurrContract] = useState([]);
@@ -32,26 +33,53 @@ function Filter() {
   const [resumeby, setResumeBy] = useState("");
   const [gender, setGender] = useState("");
 
+  const [languageArray, setLanguageArray] = useState([])
+  const [locationArray, setLocationArray] = useState([])
+  const [contractArray, setContractArray] = useState([])
+  const [skillsArray, setSkillsArray] = useState([])
+  const [nationalityArray, setNationalityArray] = useState([])
 
-  function convertStringToArray(string) {
-    return string.split(',').map(language => language.trim());
-  }
+  useEffect(() => {
+    const languageNames = lang.map((item) => item.language_name);
+    const locationNames = jobLocation.map((item) => item.location_name);
+    const nationalityNames = nationalityName.map((item) => item.nationality_name);
+    const contractStatusNames = contractStatus.map((item) => item.contract_sts_name);
+    const skillsNames = skill.map((item) => item.skill_name);
 
-  let languagesArray = []
-  const langIndices = [];
-  if (searchData.language && searchData.language.length > 0) {
-    languagesArray = convertStringToArray(searchData.language[0]);
-  } else {
-    // console.log('searchData.language is not defined or empty');
-  }
-  for (let i = 0; i < languagesArray.length; i++) {
-    for (let j = 0; j < lang.length; j++) {
-      if (languagesArray[i] === lang[j]) {
-        langIndices.push(j);
-        break;
-      }
-    }
-  }
+    setLanguageArray(languageNames);
+    setLocationArray(locationNames);
+    setNationalityArray(nationalityNames);
+    setContractArray(contractStatusNames);
+    setSkillsArray(skillsNames)
+  }, [lang, jobLocation, nationalityName, contractStatus, skill]);
+
+  // useEffect(() => {
+  //   console.log("locations :",locationArray);
+  //   console.log("Languages :",languageArray);
+  //   console.log("contractStatus :",contractArray);
+  //   console.log("Skills :", skillsArray);
+  //   console.log("nationality :", nationalityArray);
+  // }, [languageArray,locationArray,contractArray,skillsArray,nationalityArray]);
+
+  // function convertStringToArray(string) {
+  //   return string.split(',').map(language => language.trim());
+  // }
+
+  // let languagesArray = []
+  // const langIndices = [];
+  // if (searchData.language && searchData.language.length > 0) {
+  //   languagesArray = convertStringToArray(searchData.language[0]);
+  // } else {
+  //   // console.log('searchData.language is not defined or empty');
+  // }
+  // for (let i = 0; i < languagesArray.length; i++) {
+  //   for (let j = 0; j < lang.length; j++) {
+  //     if (languagesArray[i] === lang[j]) {
+  //       langIndices.push(j);
+  //       break;
+  //     }
+  //   }
+  // }
 
   // console.log("language index :", langIndices);
 
@@ -68,6 +96,7 @@ function Filter() {
       gender: queryParams.get('gender') || '',
       helper_name: queryParams.get('name') || '',
       date: queryParams.get('start_date') || '',
+      order: queryParams.get('order_by') || '',
       country: queryParams.getAll('country') || [],
       experience: queryParams.get('experience_range') ? queryParams.get('experience_range').split('-').map(Number) : [0, 40],
       age: queryParams.get('age_range') ? queryParams.get('age_range').split('-').map(Number) : [18, 60],
@@ -91,6 +120,7 @@ function Filter() {
     setGender(data.gender);
 
     dispatch(addParamsData(data));
+    dispatch(addOrder(data.order));
   }, [dispatch, searchParams]);
 
   useEffect(() => {
@@ -104,16 +134,19 @@ function Filter() {
       .then(data => {
         dispatch(addData(data))
         if (data && data.data.language && data.data.contract_status && data.data.nationality && data.data.skills && data.data.job_location) {
-          const languages = data.data.language.map(language => language.language_name);
-          const contract_status = data.data.contract_status.map((contract) => contract.contract_sts_name);
-          const nationality = data.data.nationality.map(nationality => nationality.nationality_name)
-          const skills = data.data.skills.map(skills => skills.skill_name)
-          const jobLocations = data.data.job_location.map(joblocation => joblocation.location_name)
+          // const languages = data.data.language.map(language => language.language_name);
+          const languages = data.data.language.map(language => language);
+          const contract_status = data.data.contract_status.map((contract) => contract);
+          const nationality = data.data.nationality.map(nationality => nationality)
+          const skills = data.data.skills.map(skills => skills)
+          const jobLocations = data.data.job_location.map(joblocation => joblocation)
+          const candidateCountry = data.data.candidate_country.map(candidateCountry => candidateCountry)
           dispatch(addLanguage(languages))
           dispatch(addLocation(jobLocations))
           dispatch(addSkills(skills))
           dispatch(addNationality(nationality))
           dispatch(addContract(contract_status))
+          dispatch(addCandidateCountry(candidateCountry))
         } else {
           console.log("Language data is missing or not an array:", data.languages);
         }
@@ -165,6 +198,10 @@ function Filter() {
 
     setSearchParams(urlParams.toString());
   }
+
+  useEffect(() => {
+    handleOnInputChange("order_by",order)
+  },[order])
 
   // const handleOnInputChange = (field, value) => {
   //   const params = {};
@@ -236,7 +273,7 @@ function Filter() {
   // };
 
   return (
-    <div className="w-[30%] h-[70%] rounded-md ps-[15px] pr-[15px] mt-10 pb-5 border-[1px] border-[#9999] bg-[#F9F9F9]">
+    <div className="w-[30%] h-[70%] rounded-md ps-[15px] pr-[15px] mt-16 pb-5 border-[1px] border-[#9999] bg-[#F9F9F9]">
 
       <div className="p-2 mt-4">
         <span className="text-primary text-2xl mt-2">{"I'm Looking For"}</span>
@@ -265,9 +302,9 @@ function Filter() {
                 <input
                   type="radio"
                   name="jobposition"
-                  checked={jobPosition === "Domestic-Helper"}
+                  checked={jobPosition == "Domestic-Helper"}
                   onChange={(e) => {
-                    setJobPosition(e.target.value);
+                    setJobPosition(e.target.checked);
                     handleOnInputChange("job_position", "Domestic-Helper")
                   }}
                   className={`form-radio h-5 w-5 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer ${jobPosition === "1" ? 'bg-green-500' : 'bg-blue-600'}`}
@@ -310,7 +347,7 @@ function Filter() {
               <SelectBox
                 currValue={currLocation}
                 setCurrValue={setCurrLocation}
-                valueArray={jobLocation}
+                valueArray={locationArray}
                 selectedValues={searchData.country}
                 handleOnChange={(value) => handleOnInputChange("country", value)}
               />
@@ -376,7 +413,7 @@ function Filter() {
               <SelectBox
                 currValue={currContract}
                 setCurrValue={setCurrContract}
-                valueArray={contractStatus}
+                valueArray={contractArray}
                 selectedValues={searchData.currContract}
                 handleOnChange={(value) => handleOnInputChange("contract_status", value)}
               />
@@ -448,9 +485,8 @@ function Filter() {
               <SelectBox
                 currValue={currlanguage}
                 setCurrValue={setCurrLanguage}
-                valueArray={lang}
+                valueArray={languageArray}
                 selectedValues={searchData.language}
-                languageIndex = {langIndices}
                 handleOnChange={(value) => {
                   handleOnInputChange("Language", value)
                 }}
@@ -463,8 +499,8 @@ function Filter() {
               <SelectBox
                 currValue={currskill}
                 setCurrValue={setCurrSkill}
-                valueArray={skill}
-                selectedValues = {searchData.currSkill}
+                valueArray={skillsArray}
+                selectedValues={searchData.currSkill}
                 handleOnChange={(value) => handleOnInputChange("Main-Skills", value)}
               />
             </div>
@@ -484,7 +520,7 @@ function Filter() {
                   className="w-full h-10"
                   style={{ color: "grey", fontFamily: "poppins", fontStyle: "thin", backgroundColor: "trnsperant", flex: "auto" }}
                 >
-                  {nationalityName.map((name) => (
+                  {nationalityArray.map((name) => (
                     <MenuItem
                       key={name}
                       value={name}
@@ -574,7 +610,7 @@ function Filter() {
           </div>
 
         </div>
-        
+
       </div>
 
     </div>

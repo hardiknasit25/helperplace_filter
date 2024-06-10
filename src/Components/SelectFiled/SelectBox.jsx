@@ -4,17 +4,16 @@ import ListItemText from '@mui/material/ListItemText';
 import Select from '@mui/material/Select';
 import Checkbox from '@mui/material/Checkbox';
 import PropTypes from 'prop-types';
-import { useEffect, useState } from 'react';
+// import { useEffect, useState } from 'react';
 
-function SelectBox({ currValue, setCurrValue, valueArray, handleOnChange, languageIndex }) {
+function SelectBox({ currValue, setCurrValue, valueArray, handleOnChange }) {
 
   SelectBox.propTypes = {
     currValue: PropTypes.array.isRequired, // Adjust the type according to your data type
     setCurrValue: PropTypes.func.isRequired,
     valueArray: PropTypes.array.isRequired, // Adjust the type according to your data type
     handleOnChange: PropTypes.func.isRequired,
-    selectedValues: PropTypes.array,
-    languageIndex: PropTypes.array
+    selectedValues: PropTypes.array
   };
 
   // const handleChange = (event) => {
@@ -71,8 +70,8 @@ function SelectBox({ currValue, setCurrValue, valueArray, handleOnChange, langua
       >
         {valueArray.map((name, index) => (
           <MenuItem key={index} value={name} style={{ fontFamily: "poppins" }}>
-            {/* <Checkbox checked={languageIndex > 0 ? languageIndex.indexOf(name) > -1  : currValue.indexOf(name) > -1} style={{ color: "#25AE88" }} /> */}
-            <Checkbox checked={Array.isArray(languageIndex) && languageIndex.includes(index)} style={{ color: "#25AE88" }} />
+            <Checkbox checked={currValue.indexOf(name) > -1} style={{ color: "#25AE88" }} />
+            {/* <Checkbox checked={Array.isArray(languageIndex) && languageIndex.includes(index)} style={{ color: "#25AE88" }} /> */}
             <ListItemText primary={name} style={{ fontFamily: "poppins" }} />
           </MenuItem>
         ))}
