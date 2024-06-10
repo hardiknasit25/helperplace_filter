@@ -4,6 +4,8 @@ import { FaCalendarAlt } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
 import { useSelector } from 'react-redux';
 import NotFound from './NotFound';
+import Pagination from '@mui/material/Pagination';
+import Stack from '@mui/material/Stack';
 
 function People() {
 
@@ -205,7 +207,7 @@ function People() {
     <div className="w-full mt-16">
 
       {clientData.length > 0 ? clientData.map((client) => (
-        <div className="h-[213px] flex gap-2 shadow-2xl pt-2 pb-2 rounded-md mb-5" style={{boxShadow: "grey"}} key={client.resume_id}>
+        <div className="h-[213px] flex gap-2 shadow-2xl pt-2 pb-2 rounded-sm mb-5" style={{ boxShadow: "grey" }} key={client.resume_id}>
           {/* Photo  */}
           < div className="w-[165px] h-[213px] flex flex-col justify-center items-center gap-3" >
             <div className="h-[145px] w-[165px] flex justify-center items-center p-1">
@@ -246,14 +248,24 @@ function People() {
                 <span className="text-primary font-semibold">From {getDate(client.next_job_available_date)} | {client.job_type_id === "1" ? "Full Time" : (client.job_type_id === 1 ? "Full Time" : client.job_type_id === 2 ? "Part Time" : client.job_type_id === 3 ? "Temporary" : "")}</span>
               </div>
 
+              {/* {client.very_active === '1' && ( */}
               <div className='flex justify-center items-center gap-2'>
                 <div className='w-4 h-4 bg-[#25AE88] rounded-full'></div>
                 <span className="text-[#25AE88] font-semibold">Very Active</span>
               </div>
+              {/* // )} */}
+
             </div>
           </div>
         </div >
       )) : <NotFound />}
+
+      <div className='mt-5 mb-5 flex justify-center items-center'>
+        <Stack spacing={1}>
+          <Pagination count={10} variant="outlined" shape="rounded" />
+        </Stack>
+      </div>
+
     </div>
   )
 }
