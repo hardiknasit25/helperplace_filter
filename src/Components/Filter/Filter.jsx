@@ -5,34 +5,26 @@ import { useSearchParams } from 'react-router-dom';
 import SelectBox from "../SelectFiled/SelectBox";
 import { FormControl, MenuItem, Select, Slider } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { addData, addLocation, addLanguage, addSkills, addNationality, addContract} from "../../features/dataSlice";
+import { addData, addLocation, addLanguage, addSkills, addNationality, addContract, addParamsData } from "../../features/dataSlice";
 
 function Filter() {
 
   const dispatch = useDispatch();
-  const Masterdata = useSelector((state) => state.data)
+  // const Masterdata = useSelector((state) => state.data)
   const lang = useSelector((state) => state.Language)
   const skill = useSelector((state) => state.Skills)
   const jobLocation = useSelector((state) => state.Locations)
   const contractStatus = useSelector((state) => state.contract)
   const nationalityName = useSelector((state) => state.nationality)
-
+  const searchData = useSelector((state) => state.paramsData)
   const [searchParams, setSearchParams] = useSearchParams();
-
-  // const [data, setData] = useState([]);
-  // const [lang, setLang] = useState([]);
-  // const [contractStatus, setContractStatus] = useState([]);
-  // const [nationalityName, setNationalityName] = useState([]);
-  // const [skill, setSkill] = useState([]);
-  // const [jobLocation, setJobLocation] = useState([]);
-
-  const [helperName, setHelperName] = useState("");
+  const [helperName, setHelperName] = useState(searchData.helper_name);
   const [currNationality, setCurrNationality] = useState("");
   const [currskill, setCurrSkill] = useState([]);
   const [currlanguage, setCurrLanguage] = useState([]);
   const [currContract, setCurrContract] = useState([]);
   const [currLocation, setCurrLocation] = useState([]);
-  const [currDate, setDate] = useState(null);
+  const [currDate, setDate] = useState("");
   const [age, setAge] = useState([18, 60])
   const [experience, setExperience] = useState([0, 40]);
   const [jobPosition, setJobPosition] = useState(false);
@@ -40,47 +32,66 @@ function Filter() {
   const [resumeby, setResumeBy] = useState("");
   const [gender, setGender] = useState("");
 
-  // console.log("Skill is : ", currskill);
 
-  // useEffect(() => {
+  function convertStringToArray(string) {
+    return string.split(',').map(language => language.trim());
+  }
 
-  //   if (isInitialRender) {
-  //     setIsInitialRender(false);
-  //     return;
-  //   }
+  let languagesArray = []
+  const langIndices = [];
+  if (searchData.language && searchData.language.length > 0) {
+    languagesArray = convertStringToArray(searchData.language[0]);
+  } else {
+    // console.log('searchData.language is not defined or empty');
+  }
+  for (let i = 0; i < languagesArray.length; i++) {
+    for (let j = 0; j < lang.length; j++) {
+      if (languagesArray[i] === lang[j]) {
+        langIndices.push(j);
+        break;
+      }
+    }
+  }
 
-  //   const urlParams = new URLSearchParams();
-  //   urlParams.set('start', "0")
-  //   urlParams.set('length', "20")
-  //   urlParams.set('helper_name', helperName)
-  //   urlParams.set("start_date", currDate)
-  //   urlParams.set("job_type_id", jobType)
-  //   urlParams.set("country_id", Country)
-  //   urlParams.set("position_id", jobPosition)
-  //   urlParams.set('nationality_id', currNationality)
-  //   urlParams.set('edu_id', currNationality)
-  //   urlParams.set('contract_status_id', currContract)
-  //   urlParams.set('resume_manager', resumeby)
-  //   urlParams.set('gender', gender)
-  //   if (currskill > "0") {
-  //     urlParams.set('skill_id', currskill)
-  //   }
-  //   urlParams.set('age_min', age[0])
-  //   urlParams.set('age_max', age[1])
-  //   urlParams.set('experience_min', experience[0])
-  //   urlParams.set('experience_max', experience[1])
-  //   urlParams.set('marital_status', currContract)
-  //   urlParams.set('order_by', "last_active")
-  //   urlParams.set('location_order', "0")
-  //   urlParams.set('lang', navigator.languages[2])
-  //   const searchQuery = urlParams.toString();
-  //   // console.log("SearchQuery : ", searchQuery);
+  // console.log("language index :", langIndices);
 
-  //   // navigate({
-  //   //   pathname: location.pathname,
-  //   //   search: `?${searchQuery}`
-  //   // });
-  // }, [helperName, currNationality, currlanguage, currContract, currLocation, currDate, currskill, age, experience, jobType, jobPosition, gender, resumeby, navigate, isInitialRender, location.pathname]);
+  // console.log(searchData);
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+
+    const data = {
+      job_position: queryParams.get('job_position') || '',
+      job_type: queryParams.get('job_type') || '',
+      resumeby: queryParams.get('post_manager') || '',
+      nationality: queryParams.get('nationality') || '',
+      gender: queryParams.get('gender') || '',
+      helper_name: queryParams.get('name') || '',
+      date: queryParams.get('start_date') || '',
+      country: queryParams.getAll('country') || [],
+      experience: queryParams.get('experience_range') ? queryParams.get('experience_range').split('-').map(Number) : [0, 40],
+      age: queryParams.get('age_range') ? queryParams.get('age_range').split('-').map(Number) : [18, 60],
+      language: queryParams.getAll('Language') || [],
+      currskill: queryParams.getAll('Main-Skills') || [],
+      currContract: queryParams.getAll('contract_status') || []
+    };
+
+    setHelperName(data.helper_name);
+    setCurrNationality(data.nationality);
+    setCurrSkill(data.currskill);
+    setCurrLanguage(data.language);
+    setCurrContract(data.currContract);
+    setCurrLocation(data.country);
+    setDate(data.date);
+    setAge(data.age);
+    setExperience(data.experience);
+    setJobPosition(data.job_position);
+    setJobType(data.job_type);
+    setResumeBy(data.resumeby);
+    setGender(data.gender);
+
+    dispatch(addParamsData(data));
+  }, [dispatch, searchParams]);
 
   useEffect(() => {
     fetch("/api/mobile/masterdata/GetAllMasterDataJson")
@@ -91,7 +102,6 @@ function Filter() {
         return response.json();
       })
       .then(data => {
-        // setData(data);
         dispatch(addData(data))
         if (data && data.data.language && data.data.contract_status && data.data.nationality && data.data.skills && data.data.job_location) {
           const languages = data.data.language.map(language => language.language_name);
@@ -136,21 +146,13 @@ function Filter() {
       urlParams.set(field, value.join(', '));
     } else if (typeof value === 'string' && value.trim() !== '') {
       urlParams.set(field, value.trim());
-    }
-    // else if (field === 'age' && Array.isArray(value) && value.length === 2) {
-    //   // If field is 'age' and value is an array with two elements, set 'age_min' and 'age_max' parameters
-    //   urlParams.set('age_min', value[0]);
-    //   urlParams.set('age_max', value[1]);
-    // } 
-    else {
-      // If value is empty, remove the field from the URL
+    } else {
       urlParams.delete(field);
     }
 
     searchParams.forEach((paramValue, paramName) => {
       if (paramName !== field) {
         if (paramName === 'skills') {
-          // Ensure 'skills' parameter is added as a comma-separated string
           const skillsValues = searchParams.getAll(paramName);
           if (skillsValues.length > 0) {
             urlParams.append(paramName, skillsValues.join(','));
@@ -233,14 +235,8 @@ function Filter() {
   //   window.history.replaceState({}, '', `${window.location.pathname}?${searchString}`);
   // };
 
-
-
-
-
-
-
   return (
-    <div className="w-[30%] rounded-md ps-[15px] pr-[15px] mt-10 pb-5 border-[1px] border-[#9999] bg-[#F9F9F9]">
+    <div className="w-[30%] h-[70%] rounded-md ps-[15px] pr-[15px] mt-10 pb-5 border-[1px] border-[#9999] bg-[#F9F9F9]">
 
       <div className="p-2 mt-4">
         <span className="text-primary text-2xl mt-2">{"I'm Looking For"}</span>
@@ -269,13 +265,13 @@ function Filter() {
                 <input
                   type="radio"
                   name="jobposition"
-                  checked={jobPosition === "1"}
+                  checked={jobPosition === "Domestic-Helper"}
                   onChange={(e) => {
                     setJobPosition(e.target.value);
                     handleOnInputChange("job_position", "Domestic-Helper")
                   }}
                   className={`form-radio h-5 w-5 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer ${jobPosition === "1" ? 'bg-green-500' : 'bg-blue-600'}`}
-                  value="1"
+                  value="Domestic-Helper"
                 />
                 <span>Domestic Helper</span>
               </div>
@@ -284,13 +280,13 @@ function Filter() {
                 <input
                   type="radio"
                   name="jobposition"
-                  checked={jobPosition === "2"}
+                  checked={jobPosition === "Driver"}
                   onChange={(e) => {
                     setJobPosition(e.target.value);
                     handleOnInputChange("job_position", "Driver")
                   }}
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
-                  value="2"
+                  value="Driver"
                 />
                 <span>Driver</span>
               </div>
@@ -301,7 +297,7 @@ function Filter() {
               <span className="text-primary text-lg font-semibold">Start Date</span>
               <input
                 type="date"
-                className="border-[1px] border-[#9999] p-2 rounded text-sm text-secondary outline-none"
+                className="border-[1px] border-[#9999] p-2 rounded text-sm text-secondary outline-none bg-transparent"
                 onChange={(e) => {
                   setDate(e.target.value)
                   handleOnInputChange("start_date", e.target.value)
@@ -315,6 +311,7 @@ function Filter() {
                 currValue={currLocation}
                 setCurrValue={setCurrLocation}
                 valueArray={jobLocation}
+                selectedValues={searchData.country}
                 handleOnChange={(value) => handleOnInputChange("country", value)}
               />
             </div>
@@ -331,13 +328,13 @@ function Filter() {
                 <input
                   type="radio"
                   name="jobtype"
-                  checked={jobType === "1"}
+                  checked={jobType === "Full-Time"}
                   onChange={(e) => {
                     setJobType(e.target.value);
                     handleOnInputChange("job_type", "Full-Time")
                   }}
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
-                  value="1"
+                  value="Full-Time"
                 />
                 <span>Full Time</span>
               </div>
@@ -346,13 +343,13 @@ function Filter() {
                 <input
                   type="radio"
                   name="jobtype"
-                  checked={jobType === "2"}
+                  checked={jobType === "Part-Time"}
                   onChange={(e) => {
                     setJobType(e.target.value);
                     handleOnInputChange("job_type", "Part-Time")
                   }}
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
-                  value="2"
+                  value="Part-Time"
                 />
                 <span>Part Time</span>
               </div>
@@ -361,13 +358,13 @@ function Filter() {
                 <input
                   type="radio"
                   name="jobtype"
-                  checked={jobType === "3"}
+                  checked={jobType === "Temporary"}
                   onChange={(e) => {
                     setJobType(e.target.value);
                     handleOnInputChange("job_type", "Temporary")
                   }}
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
-                  value="3"
+                  value="Temporary"
                 />
                 <span>Temporary</span>
               </div>
@@ -380,6 +377,7 @@ function Filter() {
                 currValue={currContract}
                 setCurrValue={setCurrContract}
                 valueArray={contractStatus}
+                selectedValues={searchData.currContract}
                 handleOnChange={(value) => handleOnInputChange("contract_status", value)}
               />
             </div>
@@ -396,14 +394,14 @@ function Filter() {
                 <input
                   type="radio"
                   name="resumby"
-                  checked={resumeby === "1"}
+                  checked={resumeby === "Direct"}
                   onChange={(e) => {
                     setResumeBy(e.target.value)
                     handleOnInputChange("post_manager", "Direct")
                   }
                   }
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
-                  value="1"
+                  value="Direct"
                 />
                 <span>Direct</span>
               </div>
@@ -412,14 +410,14 @@ function Filter() {
                 <input
                   type="radio"
                   name="resumby"
-                  checked={resumeby === "2"}
+                  checked={resumeby === "Agency"}
                   onChange={(e) => {
                     setResumeBy(e.target.value)
                     handleOnInputChange("post_manager", "Agency")
                   }
                   }
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
-                  value="2"
+                  value="Agency"
                 />
                 <span>Agency</span>
               </div>
@@ -427,21 +425,21 @@ function Filter() {
           </div>
 
           {/* Working Experience */}
-          <div className="mt-5">
+          <div className="mt-5 p-2">
             <span className="text-primary font-semibold mt-5">Working Experience</span>
             <div className="w-full h-[2px] bg-[#25AE88]"></div>
 
             <div className="mt-2 p-3">
               <Slider
-                getAriaLabel={() => 'Temperature range'}
-                value={experience}
-                onChange={(e, nextValue) => {
-                  setExperience(nextValue)
-                  handleOnInputChange("experience_range", nextValue)
-                }}
-                valueLabelDisplay="auto"
                 min={0}
                 max={40}
+                value={experience}
+                onChange={(e, newValue) => {
+                  setExperience(newValue)
+                  handleOnInputChange("experience_range", newValue.join('-'))
+                }}
+                valueLabelDisplay="auto"
+                aria-labelledby="range-slider"
               />
             </div>
 
@@ -451,8 +449,9 @@ function Filter() {
                 currValue={currlanguage}
                 setCurrValue={setCurrLanguage}
                 valueArray={lang}
+                selectedValues={searchData.language}
+                languageIndex = {langIndices}
                 handleOnChange={(value) => {
-                  console.log("value is :", value);
                   handleOnInputChange("Language", value)
                 }}
               />
@@ -465,6 +464,7 @@ function Filter() {
                 currValue={currskill}
                 setCurrValue={setCurrSkill}
                 valueArray={skill}
+                selectedValues = {searchData.currSkill}
                 handleOnChange={(value) => handleOnInputChange("Main-Skills", value)}
               />
             </div>
@@ -472,7 +472,7 @@ function Filter() {
             <div className="flex flex-col gap-3 mt-3">
               <span className="text-primary text-lg font-semibold">Nationality</span>
 
-              <FormControl className="w-full">
+              <FormControl className="w-[300px]">
                 <Select
                   labelId="demo-multiple-name-label"
                   id="demo-multiple-name"
@@ -509,14 +509,14 @@ function Filter() {
                 <input
                   type="radio"
                   name="gender"
-                  checked={gender === "1"}
+                  checked={gender === "Male"}
                   onChange={(e) => {
                     setGender(e.target.value)
                     handleOnInputChange("gender", "Male")
                   }
                   }
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
-                  value="1"
+                  value="Male"
                 />
                 <span>Male</span>
               </div>
@@ -525,14 +525,14 @@ function Filter() {
                 <input
                   type="radio"
                   name="gender"
-                  checked={gender === "2"}
+                  checked={gender === "Female"}
                   onChange={(e) => {
                     setGender(e.target.value)
                     handleOnInputChange("gender", "Female")
                   }
                   }
                   className="form-radio h-5 w-5 text-blue-600 transition-shadow duration-200 ease-in-out hover:shadow-lg hover:shadow-grey-600/50 cursor-pointer"
-                  value="2"
+                  value="Female"
                 />
                 <span>Female</span>
               </div>
@@ -549,19 +549,19 @@ function Filter() {
                 value={age}
                 onChange={(e, newValue) => {
                   setAge(newValue)
-                  console.log(newValue);
-                  handleOnInputChange('age_range', newValue);
+                  handleOnInputChange('age_range', newValue.join('-'));
                 }}
                 valueLabelDisplay="auto"
                 min={18}
                 max={60}
+                aria-labelledby="range-slider"
               />
             </div>
 
             <div className="flex flex-col gap-3">
               <span className="text-primary text-lg font-semibold">Helper Name</span>
               <div className="border-[1px] w-full border-[#9999] rounded flex justify-between items-center pr-5">
-                <input type="text" placeholder="Search with Helper Name" className=" p-2  text-sm text-secondary outline-none" value={helperName} onChange={(e) => {
+                <input type="text" placeholder="Search with Helper Name" className="p-2 text-sm text-secondary outline-none bg-transparent" value={helperName} onChange={(e) => {
                   setHelperName(e.target.value)
                   handleOnInputChange("name", e.target.value)
                 }

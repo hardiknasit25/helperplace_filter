@@ -1,8 +1,7 @@
 function Jobs() {
-  
   return (
-    <p>Jobs</p>
-  );
+    <div>Jobs</div>
+  )
 }
 
-export default Jobs;
+export default Jobs
