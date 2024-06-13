@@ -5,8 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 import SelectBox from "../SelectFiled/SelectBox";
 import { FormControl, MenuItem, Select, Slider } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { addData, addLocation, addLanguage, addSkills, addNationality, addContract, addParamsData, addCandidateCountry, addOrder } from "../../features/dataSlice";
-import Order from "../Hero/order";
+import { addData, addLocation, addLanguage, addSkills, addNationality, addContract, addParamsData, addCandidateCountry, addOrder, addPage } from "../../features/dataSlice";
 
 function Filter() {
 
@@ -18,6 +17,7 @@ function Filter() {
   const nationalityName = useSelector((state) => state.nationality)
   const searchData = useSelector((state) => state.paramsData)
   const order = useSelector((slice) => slice.order);
+  const page = useSelector((slice) => slice.page);
   const [searchParams, setSearchParams] = useSearchParams();
   const [helperName, setHelperName] = useState(searchData.helper_name);
   const [currNationality, setCurrNationality] = useState('');
@@ -39,12 +39,17 @@ function Filter() {
   const [skillsArray, setSkillsArray] = useState([])
   const [nationalityArray, setNationalityArray] = useState([])
 
+  function convertStringToArray(string) {
+    let lowerstring = string.toLowerCase();
+    return lowerstring.split(',').map(language => language.trim());
+  }
+
   useEffect(() => {
-    const languageNames = lang.map((item) => item.language_name);
-    const locationNames = jobLocation.map((item) => item.location_name);
-    const nationalityNames = nationalityName.map((item) => item.nationality_name);
-    const contractStatusNames = contractStatus.map((item) => item.contract_sts_name);
-    const skillsNames = skill.map((item) => item.skill_name);
+    const languageNames = lang.map((item) => item.language_name.toLowerCase());
+    const locationNames = jobLocation.map((item) => item.location_name.toLowerCase());
+    const nationalityNames = nationalityName.map((item) => item.nationality_name.toLowerCase());
+    const contractStatusNames = contractStatus.map((item) => item.contract_sts_name.toLowerCase());
+    const skillsNames = skill.map((item) => item.skill_name.toLowerCase());
 
     setLanguageArray(languageNames);
     setLocationArray(locationNames);
@@ -88,6 +93,38 @@ function Filter() {
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
 
+    const country = queryParams.getAll('country') || []
+    let countryArray = []
+    if (country && country.length > 0) {
+      countryArray = convertStringToArray(country[0]);
+    } else {
+      // console.log('searchData.country is not defined or empty');
+    }
+
+    const language = queryParams.getAll('Language') || []
+    let languagesArray = []
+    if (language && language.length > 0) {
+      languagesArray = convertStringToArray(language[0]);
+    } else {
+      // console.log('searchData.language is not defined or empty');
+    }
+
+    const currskill = queryParams.getAll('Main-Skills') || []
+    let skillsArray = []
+    if (currskill && currskill.length > 0) {
+      skillsArray = convertStringToArray(currskill[0]);
+    } else {
+      // console.log('searchData.country is not defined or empty');
+    }
+
+    const currContract = queryParams.getAll('contract_status') || []
+    let contractArray = [];
+    if (currContract && currContract.length > 0) {
+      contractArray = convertStringToArray(currContract[0]);
+    } else {
+      // console.log('searchData.country is not defined or empty');
+    }
+
     const data = {
       job_position: queryParams.get('job_position') || '',
       job_type: queryParams.get('job_type') || '',
@@ -97,12 +134,13 @@ function Filter() {
       helper_name: queryParams.get('name') || '',
       date: queryParams.get('start_date') || '',
       order: queryParams.get('order_by') || '',
-      country: queryParams.getAll('country') || [],
+      page: queryParams.get('page') || '',
+      country: countryArray,
       experience: queryParams.get('experience_range') ? queryParams.get('experience_range').split('-').map(Number) : [0, 40],
       age: queryParams.get('age_range') ? queryParams.get('age_range').split('-').map(Number) : [18, 60],
-      language: queryParams.getAll('Language') || [],
-      currskill: queryParams.getAll('Main-Skills') || [],
-      currContract: queryParams.getAll('contract_status') || []
+      language: languagesArray,
+      currskill: skillsArray,
+      currContract: contractArray
     };
 
     setHelperName(data.helper_name);
@@ -118,9 +156,9 @@ function Filter() {
     setJobType(data.job_type);
     setResumeBy(data.resumeby);
     setGender(data.gender);
-
     dispatch(addParamsData(data));
     dispatch(addOrder(data.order));
+    dispatch(addPage(data.page));
   }, [dispatch, searchParams]);
 
   useEffect(() => {
@@ -179,6 +217,8 @@ function Filter() {
       urlParams.set(field, value.join(', '));
     } else if (typeof value === 'string' && value.trim() !== '') {
       urlParams.set(field, value.trim());
+    } else if (typeof value === 'number') {
+      urlParams.set(field, value.toString());
     } else {
       urlParams.delete(field);
     }
@@ -200,77 +240,12 @@ function Filter() {
   }
 
   useEffect(() => {
-    handleOnInputChange("order_by",order)
-  },[order])
+    handleOnInputChange("order_by", order)
+  }, [order])
 
-  // const handleOnInputChange = (field, value) => {
-  //   const params = {};
-
-  //   if (Array.isArray(value) && value.length > 0) {
-  //     params[field] = value.join(', ');
-  //   } else if (typeof value === 'string' && value.trim() !== '') {
-  //     params[field] = value.trim();
-  //   }
-  //    else if (field === 'age' && Array.isArray(value) && value.length === 2) {
-  //     // If field is 'age' and value is an array with two elements, set 'age_min' and 'age_max' parameters
-  //     params['age_min'] = value[0];
-  //     params['age_max'] = value[1];
-  //   }
-
-  //   // Add other parameters from searchParams
-  //   searchParams.forEach((paramValue, paramName) => {
-  //     if (paramName !== field) {
-  //       params[paramName] = paramValue;
-  //     }
-  //   });
-
-  //   // Construct the query string
-  //   let queryString = '';
-  //   for (const key in params) {
-  //     if (params.hasOwnProperty(key)) {
-  //       queryString += `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}&`;
-  //     }
-  //   }
-  //   queryString = queryString.slice(0, -1); // Remove the trailing '&'
-
-  //   // Update the URL search parameters
-  //   setSearchParams(queryString);
-  // }
-
-
-  // const handleOnInputChange = (field, value) => {
-  //   // Parse the current search parameters into an object
-  //   const params = {};
-  //   const searchParams = window.location.search.substring(1).split('&');
-
-  //   // Populate the params object with the current search parameters
-  //   for (const param of searchParams) {
-  //     const [key, val] = param.split('=');
-  //     params[key] = val ? decodeURIComponent(val.replace(/\+/g, ' ')) : '';
-  //   }
-
-  //   // Update the value for the specified field
-  //   if (Array.isArray(value) && value.length > 0) {
-  //     params[field] = value.join(',');
-  //   } else if (typeof value === 'string' && value.trim() !== '') {
-  //     if (field === 'language') {
-  //       params[field] = value.split(',').map(item => item.trim()).join(',');
-  //     } else {
-  //       params[field] = value.trim();
-  //     }
-  //   } else {
-  //     // If value is empty, remove the field
-  //     delete params[field];
-  //   }
-
-  //   // Construct the new search string
-  //   const searchString = Object.entries(params)
-  //     .map(([key, val]) => `${encodeURIComponent(key)}=${encodeURIComponent(val)}`)
-  //     .join('&');
-
-  //   // Update the URL with the new search string
-  //   window.history.replaceState({}, '', `${window.location.pathname}?${searchString}`);
-  // };
+  useEffect(() => {
+    handleOnInputChange("page", page)
+  }, [page])
 
   return (
     <div className="w-[30%] h-[70%] rounded-md ps-[15px] pr-[15px] mt-16 pb-5 border-[1px] border-[#9999] bg-[#F9F9F9]">
@@ -349,7 +324,9 @@ function Filter() {
                 setCurrValue={setCurrLocation}
                 valueArray={locationArray}
                 selectedValues={searchData.country}
-                handleOnChange={(value) => handleOnInputChange("country", value)}
+                handleOnChange={(value) => {
+                  handleOnInputChange("country", value)
+                }}
               />
             </div>
 

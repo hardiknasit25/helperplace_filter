@@ -1,41 +1,70 @@
-import { useState, useEffect } from 'react';
-import { Stack, Pagination } from '@mui/material';
+import { useState } from 'react';
+import Select, { components } from 'react-select';
 
-const Jobs = ({ itemsPerPage, items }) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [currentItems, setCurrentItems] = useState([]);
+function Jobs() {
+  const lang = [
+    'English', 'Cantonese', 'Mandarin', 'Japanese', 'Arabic',
+    'Filipino', 'Indonesian', 'Hindi', 'Thai'
+  ];
 
-  useEffect(() => {
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    setCurrentItems(items.slice(indexOfFirstItem, indexOfLastItem));
-  }, [currentPage, itemsPerPage, items]);
+  const options = lang.map((language) => ({
+    value: language,
+    label: language
+  }));
 
-  const handlePageChange = (event, value) => {
-    setCurrentPage(value);
+  const [selectedOptions, setSelectedOptions] = useState([]);
+
+  const handleonChange = (selected) => {
+    setSelectedOptions(selected || []);
   };
 
-  return (
-    <div>
-      <Stack spacing={1}>
-        <Pagination
-          count={Math.ceil(items.length / itemsPerPage)}
-          variant="outlined"
-          shape="rounded"
-          page={currentPage}
-          onChange={handlePageChange}
-        />
-      </Stack>
-      <div>
-        {currentItems.map((item, index) => (
-          <div key={index}>
-            {/* Render your item component here */}
-            {item}
-          </div>
-        ))}
+  const formatSelectedOptions = (selectedOptions) => {
+    return selectedOptions.map(option => `${option.label}`).join('');
+  };
+
+  const CheckboxOption = ({ children,isSelected, ...props }) => (
+    <components.Option {...props}>
+      <div className='flex justify-start items-center'>
+        <input type="checkbox" checked={isSelected} onChange={() => props.isFocused} className='mr-2 w-4 h-4' />
+        <label>{children}</label>
       </div>
-    </div>
+    </components.Option>
   );
-};
+
+  const selectedString = formatSelectedOptions(selectedOptions);
+
+  return (
+    <Select
+      value={{ value: selectedString, label: selectedString }}
+      onChange={handleonChange}
+      placeholder="Select an option..." 
+      options={options}
+      isMulti
+      isSearchable
+      components={{ Option: CheckboxOption }}
+      styles={{
+        clearIndicator: (baseStyles) => ({
+          ...baseStyles,
+          color: "grey",
+          cursor: 'pointer'
+        }),
+        multiValueLabel: () => ({
+          background: "transperant",
+          backgroundColor: 'transperant'
+        }),
+        multiValueRemove: () => ({
+          background: "none",
+          display: 'none'
+        }),
+        singleValue: () => ({
+          background: 'transperant'
+        }),
+        multiValue: () => ({
+          background: 'none'
+        })
+      }}
+    />
+  );
+}
 
 export default Jobs;

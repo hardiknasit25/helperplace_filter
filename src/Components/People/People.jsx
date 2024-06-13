@@ -1,14 +1,15 @@
-// import { useEffect } from 'react';
 import { useEffect, useState } from 'react';
 import { FaCalendarAlt } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import NotFound from './NotFound';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
+import { addPage } from '../../features/dataSlice';
 
 function People() {
 
+  const [clientData, setClientData] = useState([])
   const searchData = useSelector((state) => state.paramsData)
   const lang = useSelector((state) => state.Language)
   const Locations = useSelector((state) => state.Locations)
@@ -18,13 +19,22 @@ function People() {
   const candidateCountry = useSelector((state) => state.candidateCountry)
   const order = useSelector((state) => state.order)
 
-  const [clientData, setClientData] = useState([])
+  const dispatch = useDispatch();
 
-  function convertStringToArray(string) {
-    return string.split(',').map(language => language.trim());
-  }
+  const [currentPage, setCurrentPage] = useState(1);
+  const [clientsPerPage] = useState(20); // Number of clients per page
 
-  // console.log("search data :",searchData);
+  const indexOfLastClient = currentPage * clientsPerPage;
+  const indexOfFirstClient = indexOfLastClient - clientsPerPage;
+  const currentClients = clientData.slice(indexOfFirstClient, indexOfLastClient);
+
+  const handleChangePage = (event, page) => {
+    setCurrentPage(page);
+  };
+
+  useEffect(() => {
+    dispatch(addPage(currentPage));
+  },[currentPage]);
 
   //get Clint Country name from country code which provided by response from API
   const getLocationName = (locationId) => {
@@ -49,64 +59,40 @@ function People() {
   }
 
   // covert language into array and get a index***************************  
-  let languagesArray = []
   const langIndices = [];
-  if (searchData.language && searchData.language.length > 0) {
-    languagesArray = convertStringToArray(searchData.language[0]);
-  } else {
-    // console.log('searchData.language is not defined or empty');
-  }
-  for (let i = 0; i < languagesArray.length; i++) {
+  for (let i = 0; i < searchData.language.length; i++) {
     lang.map((item) => {
-      if (item.language_name === languagesArray[i])
+      if (item.language_name.toLowerCase() === searchData.language[i])
         langIndices.push(item.language_id)
     })
   }
   // const serializedLanguageArray = langIndices.join(',');
 
-  // covert language into array and get a index**************************  
-  let countryArray = []
+  // covert country into array and get a index**************************
   const countryIndices = [];
-  if (searchData.country && searchData.country.length > 0) {
-    countryArray = convertStringToArray(searchData.country[0]);
-  } else {
-    // console.log('searchData.country is not defined or empty');
-  }
-  for (let i = 0; i < countryArray.length; i++) {
+  for (let i = 0; i < searchData.country.length; i++) {
     Locations.map((item) => {
-      if (item.country_name === countryArray[i])
+      if (item.country_name.toLowerCase() === searchData.country[i])
         countryIndices.push(item.job_location_id)
     })
   }
   const serializedCountryArray = countryIndices.join(',');
 
   // covert Skills into array and get a index**************************  
-  let skillsArray = []
   const skillsIndices = [];
-  if (searchData.currskill && searchData.currskill.length > 0) {
-    skillsArray = convertStringToArray(searchData.currskill[0]);
-  } else {
-    // console.log('searchData.country is not defined or empty');
-  }
-  for (let i = 0; i < skillsArray.length; i++) {
+  for (let i = 0; i < searchData.currskill.length; i++) {
     Skills.map((item) => {
-      if (item.skill_name === skillsArray[i])
+      if (item.skill_name.toLowerCase() === searchData.currskill[i])
         skillsIndices.push(item.skill_id)
     })
   }
   const serializedSkillsArray = skillsIndices.join(',');
 
   // covert Contract into array and get a index**************************  
-  let contractArray = []
   const contractIndices = [];
-  if (searchData.currContract && searchData.currContract.length > 0) {
-    contractArray = convertStringToArray(searchData.currContract[0]);
-  } else {
-    // console.log('searchData.country is not defined or empty');
-  }
-  for (let i = 0; i < contractArray.length; i++) {
+  for (let i = 0; i < searchData.currContract.length; i++) {
     contract.map((item) => {
-      if (item.contract_sts_name === contractArray[i])
+      if (item.contract_sts_name.toLowerCase() === searchData.currContract[i])
         contractIndices.push(item.contract_sts_id)
     })
   }
@@ -122,7 +108,7 @@ function People() {
   //generate SearchURL 
   const urlParams = new URLSearchParams();
   urlParams.set('start', "0")
-  urlParams.set('length', "20")
+  urlParams.set('length', clientsPerPage)
   urlParams.set('helper_name', searchData.helper_name)
   urlParams.set("start_date", searchData.date)
   urlParams.set("job_type_id",
@@ -155,9 +141,9 @@ function People() {
   urlParams.set('location_order', "0")
   urlParams.set('lang', navigator.languages[2])
   const searchQuery = urlParams.toString();
-  // console.log(searchQuery);
+  console.log(searchQuery);
 
-  //Fetch client data
+   //Fetch client data
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -206,7 +192,7 @@ function People() {
   return (
     <div className="w-full mt-16">
 
-      {clientData.length > 0 ? clientData.map((client) => (
+      {currentClients.length > 0 ? currentClients.map((client) => (
         <div className="h-[213px] flex gap-2 shadow-2xl pt-2 pb-2 rounded-sm mb-5" style={{ boxShadow: "grey" }} key={client.resume_id}>
           {/* Photo  */}
           < div className="w-[165px] h-[213px] flex flex-col justify-center items-center gap-3" >
@@ -262,7 +248,13 @@ function People() {
 
       <div className='mt-5 mb-5 flex justify-center items-center'>
         <Stack spacing={1}>
-          <Pagination count={10} variant="outlined" shape="rounded" />
+          <Pagination
+            count={Math.ceil(clientData.length / clientsPerPage)}
+            variant="outlined"
+            shape="rounded"
+            page={currentPage}
+            onChange={handleChangePage}
+          />
         </Stack>
       </div>
 

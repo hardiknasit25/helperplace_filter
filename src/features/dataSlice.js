@@ -8,6 +8,7 @@ const initialState = {
   contract: [],
   nationality: [],
   candidateCountry: [],
+  page: '',
   order: '',
   paramsData: {
     job_position: "",
@@ -17,6 +18,8 @@ const initialState = {
     gender: "",
     helper_name: "",
     date: "",
+    order: "",
+    page: "",
     country: [],
     experience: [],
     age: [],
@@ -47,6 +50,8 @@ export const dataSlice = createSlice({
         gender: action.payload.gender,
         helper_name: action.payload.helper_name,
         date: action.payload.date,
+        order: action.payload.order,
+        page: action.payload.page,
         country: action.payload.country,
         experience: action.payload.experience,
         age: action.payload.age,
@@ -54,10 +59,11 @@ export const dataSlice = createSlice({
         currskill: action.payload.currskill,
         currContract: action.payload.currContract
       }
-    }
+    },
+    addPage : (state,action) => {state.page = action.payload}
   }
 })
 
-export const { addData, addLocation, addLanguage, addSkills, addNationality, addContract, addParamsData, addCandidateCountry, addOrder } = dataSlice.actions
+export const { addData, addLocation, addLanguage, addSkills, addNationality, addContract, addParamsData, addCandidateCountry, addOrder, addPage } = dataSlice.actions
 
 export default dataSlice.reducer
