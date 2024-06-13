@@ -23,6 +23,7 @@ function People() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [clientsPerPage] = useState(20); // Number of clients per page
+  const [clientData_records, setClientData_records] = useState('');
 
   const indexOfLastClient = currentPage * clientsPerPage;
   const indexOfFirstClient = indexOfLastClient - clientsPerPage;
@@ -34,7 +35,7 @@ function People() {
 
   useEffect(() => {
     dispatch(addPage(currentPage));
-  },[currentPage]);
+  }, [currentPage]);
 
   //get Clint Country name from country code which provided by response from API
   const getLocationName = (locationId) => {
@@ -71,9 +72,9 @@ function People() {
   // covert country into array and get a index**************************
   const countryIndices = [];
   for (let i = 0; i < searchData.country.length; i++) {
-    Locations.map((item) => {
+    candidateCountry.map((item) => {
       if (item.country_name.toLowerCase() === searchData.country[i])
-        countryIndices.push(item.job_location_id)
+        countryIndices.push(item.country_id)
     })
   }
   const serializedCountryArray = countryIndices.join(',');
@@ -141,9 +142,9 @@ function People() {
   urlParams.set('location_order', "0")
   urlParams.set('lang', navigator.languages[2])
   const searchQuery = urlParams.toString();
-  console.log(searchQuery);
+  // console.log(searchQuery);
 
-   //Fetch client data
+  //Fetch client data
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -153,6 +154,7 @@ function People() {
         }
         const data = await response.json();
         setClientData(data.data);
+        setClientData_records(data.records_total);
       } catch (error) {
         console.error('Fetch error: ', error);
       }

@@ -18,6 +18,7 @@ function Filter() {
   const searchData = useSelector((state) => state.paramsData)
   const order = useSelector((slice) => slice.order);
   const page = useSelector((slice) => slice.page);
+  const candidateCountry = useSelector((slice) => slice.candidateCountry);
   const [searchParams, setSearchParams] = useSearchParams();
   const [helperName, setHelperName] = useState(searchData.helper_name);
   const [currNationality, setCurrNationality] = useState('');
@@ -46,7 +47,7 @@ function Filter() {
 
   useEffect(() => {
     const languageNames = lang.map((item) => item.language_name.toLowerCase());
-    const locationNames = jobLocation.map((item) => item.location_name.toLowerCase());
+    const locationNames = candidateCountry.map((item) => item.country_name.toLowerCase());
     const nationalityNames = nationalityName.map((item) => item.nationality_name.toLowerCase());
     const contractStatusNames = contractStatus.map((item) => item.contract_sts_name.toLowerCase());
     const skillsNames = skill.map((item) => item.skill_name.toLowerCase());
@@ -56,7 +57,7 @@ function Filter() {
     setNationalityArray(nationalityNames);
     setContractArray(contractStatusNames);
     setSkillsArray(skillsNames)
-  }, [lang, jobLocation, nationalityName, contractStatus, skill]);
+  }, [lang, candidateCountry, nationalityName, contractStatus, skill]);
 
   // useEffect(() => {
   //   console.log("locations :",locationArray);
