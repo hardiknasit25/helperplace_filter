@@ -325,6 +325,7 @@ function Filter() {
                 setCurrValue={setCurrLocation}
                 valueArray={locationArray}
                 selectedValues={searchData.country}
+                placeholder={'Candidate Location'}
                 handleOnChange={(value) => {
                   handleOnInputChange("country", value)
                 }}
@@ -392,6 +393,7 @@ function Filter() {
                 currValue={currContract}
                 setCurrValue={setCurrContract}
                 valueArray={contractArray}
+                placeholder={'Contract Status'}
                 selectedValues={searchData.currContract}
                 handleOnChange={(value) => handleOnInputChange("contract_status", value)}
               />
@@ -464,6 +466,7 @@ function Filter() {
                 currValue={currlanguage}
                 setCurrValue={setCurrLanguage}
                 valueArray={languageArray}
+                placeholder={'Search'}
                 selectedValues={searchData.language}
                 handleOnChange={(value) => {
                   handleOnInputChange("Language", value)
@@ -478,6 +481,7 @@ function Filter() {
                 currValue={currskill}
                 setCurrValue={setCurrSkill}
                 valueArray={skillsArray}
+                placeholder={'Search'}
                 selectedValues={searchData.currSkill}
                 handleOnChange={(value) => handleOnInputChange("Main-Skills", value)}
               />
@@ -491,6 +495,7 @@ function Filter() {
                   labelId="demo-multiple-name-label"
                   id="demo-multiple-name"
                   value={currNationality}
+                  displayEmpty  
                   onChange={(e) => {
                     setCurrNationality(e.target.value)
                     handleOnInputChange("nationality", e.target.value)
@@ -498,6 +503,9 @@ function Filter() {
                   className="w-full h-10"
                   style={{ color: "grey", fontFamily: "poppins", fontStyle: "thin", backgroundColor: "trnsperant", flex: "auto" }}
                 >
+                  <MenuItem value="">
+                    <em>Any Nationality</em>
+                  </MenuItem>
                   {nationalityArray.map((name) => (
                     <MenuItem
                       key={name}

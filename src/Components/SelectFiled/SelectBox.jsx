@@ -8,7 +8,7 @@ import TextField from '@mui/material/TextField';
 import PropTypes from 'prop-types';
 import { ListSubheader } from '@mui/material';
 
-function SelectBox({ currValue, setCurrValue, valueArray, handleOnChange }) {
+function SelectBox({ currValue, setCurrValue, valueArray, handleOnChange, placeholder }) {
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleChange = (event) => {
@@ -30,12 +30,14 @@ function SelectBox({ currValue, setCurrValue, valueArray, handleOnChange }) {
         multiple
         value={currValue}
         onChange={handleChange}
+        displayEmpty 
         renderValue={(selected) => {
           if (selected.length === 0) {
-            return <em>Placeholder</em>;
+            return <em>{placeholder}</em>;
           }
           return selected.join(', ');
         }}
+        onClose={() => setSearchQuery("")}
         style={{ color: 'grey', fontFamily: 'poppins', backgroundColor: 'transparent', flex: 'auto' }}
         MenuProps={{
           PaperProps: {
@@ -91,6 +93,7 @@ SelectBox.propTypes = {
   setCurrValue: PropTypes.func.isRequired,
   valueArray: PropTypes.array.isRequired,
   handleOnChange: PropTypes.func.isRequired,
+  placeholder: PropTypes.string
 };
 
 export default SelectBox;

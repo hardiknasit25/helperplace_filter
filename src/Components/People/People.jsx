@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { FaCalendarAlt } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
 import { useDispatch, useSelector } from 'react-redux';
+import { useLocation, useNavigate } from 'react-router-dom';
 import NotFound from './NotFound';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
@@ -10,6 +11,8 @@ import { addPage } from '../../features/dataSlice';
 function People() {
 
   const [clientData, setClientData] = useState([])
+  const [clientDataRecords, setClientDataRecords] = useState('');
+
   const searchData = useSelector((state) => state.paramsData)
   const lang = useSelector((state) => state.Language)
   const Locations = useSelector((state) => state.Locations)
@@ -21,9 +24,15 @@ function People() {
 
   const dispatch = useDispatch();
 
-  const [currentPage, setCurrentPage] = useState(1);
+  const params = new URLSearchParams(location.search);
+  const initialPage = parseInt(params.get('page')) || 1;
+
+  // const [currentPage, setCurrentPage] = useState(initialPage);
+  // const [clientsPerPage] = useState(20); // Number of clients per page
+
+
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const [clientsPerPage] = useState(20); // Number of clients per page
-  const [clientData_records, setClientData_records] = useState('');
 
   const indexOfLastClient = currentPage * clientsPerPage;
   const indexOfFirstClient = indexOfLastClient - clientsPerPage;
@@ -35,7 +44,7 @@ function People() {
 
   useEffect(() => {
     dispatch(addPage(currentPage));
-  }, [currentPage]);
+  }, [currentPage, dispatch]);
 
   //get Clint Country name from country code which provided by response from API
   const getLocationName = (locationId) => {
@@ -108,7 +117,7 @@ function People() {
 
   //generate SearchURL 
   const urlParams = new URLSearchParams();
-  urlParams.set('start', "0")
+  urlParams.set('start', (currentPage - 1))
   urlParams.set('length', clientsPerPage)
   urlParams.set('helper_name', searchData.helper_name)
   urlParams.set("start_date", searchData.date)
@@ -142,26 +151,30 @@ function People() {
   urlParams.set('location_order', "0")
   urlParams.set('lang', navigator.languages[2])
   const searchQuery = urlParams.toString();
-  // console.log(searchQuery);
+  console.log(searchQuery);
 
   //Fetch client data
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`https://api.helperplace.com/api/mobile/candidate/FindCandidate${"?" + searchQuery}`);
-        if (!response.ok) {
-          throw new Error('Network response was not ok: ' + response.statusText);
+    // Fetch data only if searchQuery is not empty
+    if (searchQuery !== '') {
+      const fetchData = async () => {
+        try {
+          const response = await fetch(`https://api.helperplace.com/api/mobile/candidate/FindCandidate?${searchQuery}`);
+          if (!response.ok) {
+            throw new Error('Network response was not ok: ' + response.statusText);
+          }
+          const data = await response.json();
+          setClientData(data.data);
+          setClientDataRecords(data.records_total);
+        } catch (error) {
+          console.error('Fetch error: ', error);
         }
-        const data = await response.json();
-        setClientData(data.data);
-        setClientData_records(data.records_total);
-      } catch (error) {
-        console.error('Fetch error: ', error);
-      }
-    };
+      };
 
-    fetchData();
-  }, [searchQuery]);
+      fetchData();
+    }
+  }, [searchQuery]); // Only run useEffect when searchQuery changes
+
 
   // function useDebounce(callback, delay) {
   //   const timeoutRef = useRef(null);
@@ -194,7 +207,7 @@ function People() {
   return (
     <div className="w-full mt-16">
 
-      {currentClients.length > 0 ? currentClients.map((client) => (
+      {clientData.length > 0 ? clientData.map((client) => (
         <div className="h-[213px] flex gap-2 shadow-2xl pt-2 pb-2 rounded-sm mb-5" style={{ boxShadow: "grey" }} key={client.resume_id}>
           {/* Photo  */}
           < div className="w-[165px] h-[213px] flex flex-col justify-center items-center gap-3" >
@@ -251,7 +264,7 @@ function People() {
       <div className='mt-5 mb-5 flex justify-center items-center'>
         <Stack spacing={1}>
           <Pagination
-            count={Math.ceil(clientData.length / clientsPerPage)}
+            count={Math.ceil(clientDataRecords / clientsPerPage)}
             variant="outlined"
             shape="rounded"
             page={currentPage}
