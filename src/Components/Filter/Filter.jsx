@@ -12,7 +12,7 @@ function Filter() {
   const dispatch = useDispatch();
   const lang = useSelector((state) => state.Language)
   const skill = useSelector((state) => state.Skills)
-  const jobLocation = useSelector((state) => state.Locations)
+  // const jobLocation = useSelector((state) => state.Locations)
   const contractStatus = useSelector((state) => state.contract)
   const nationalityName = useSelector((state) => state.nationality)
   const searchData = useSelector((state) => state.paramsData)
@@ -212,7 +212,9 @@ function Filter() {
 
   const handleOnInputChange = (field, value) => {
 
+    // dispatch(addPage('1'))
     const urlParams = new URLSearchParams();
+    urlParams.set("page", "1");
 
     if (Array.isArray(value) && value.length > 0) {
       urlParams.set(field, value.join(', '));
@@ -238,6 +240,7 @@ function Filter() {
     });
 
     setSearchParams(urlParams.toString());
+    // dispatch(addPage('1')); 
   }
 
   useEffect(() => {

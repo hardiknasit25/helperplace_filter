@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { FaCalendarAlt } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
 import { useDispatch, useSelector } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router-dom';
 import NotFound from './NotFound';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
@@ -15,7 +14,7 @@ function People() {
 
   const searchData = useSelector((state) => state.paramsData)
   const lang = useSelector((state) => state.Language)
-  const Locations = useSelector((state) => state.Locations)
+  // const Locations = useSelector((state) => state.Locations)
   const Skills = useSelector((state) => state.Skills)
   const contract = useSelector((state) => state.contract)
   const nationalityList = useSelector((state) => state.nationality)
