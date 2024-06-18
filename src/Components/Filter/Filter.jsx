@@ -251,6 +251,11 @@ function Filter() {
     handleOnInputChange("page", page)
   }, [page])
 
+  const handleOnSubmit = (e) => {
+    e.preventDefault();
+    handleOnInputChange("name", helperName)
+  }
+
   return (
     <div className="w-[30%] h-[70%] rounded-md ps-[15px] pr-[15px] mt-16 pb-5 border-[1px] border-[#9999] bg-[#F9F9F9]">
 
@@ -585,15 +590,14 @@ function Filter() {
 
             <div className="flex flex-col gap-3">
               <span className="text-primary text-lg font-semibold">Helper Name</span>
-              <div className="border-[1px] w-full border-[#9999] rounded flex justify-between items-center pr-5">
-                <input type="text" placeholder="Search with Helper Name" className="p-2 text-sm text-secondary outline-none bg-transparent" value={helperName} onChange={(e) => {
+              <form onSubmit={handleOnSubmit} className="border-[1px] w-full border-[#9999] rounded flex justify-between items-center pr-5">
+                <input type="text" placeholder="Search with Helper Name" className="p-2 text-sm text-secondary outline-none bg-transparent" value={helperName}
+                 onChange={(e) => {
                   setHelperName(e.target.value)
-                  handleOnInputChange("name", e.target.value)
-                }
-                }
+                }}
                 />
                 <IoSearchOutline className="text-[#3a3a3a99] h-5 w-5" />
-              </div>
+              </form>
             </div>
 
           </div>
