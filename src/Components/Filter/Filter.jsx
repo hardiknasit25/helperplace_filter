@@ -212,7 +212,6 @@ function Filter() {
 
   const handleOnInputChange = (field, value) => {
 
-    // dispatch(addPage('1'))
     const urlParams = new URLSearchParams();
     urlParams.set("page", "1");
 
@@ -240,7 +239,6 @@ function Filter() {
     });
 
     setSearchParams(urlParams.toString());
-    // dispatch(addPage('1')); 
   }
 
   useEffect(() => {
@@ -503,7 +501,7 @@ function Filter() {
                   labelId="demo-multiple-name-label"
                   id="demo-multiple-name"
                   value={currNationality}
-                  displayEmpty  
+                  displayEmpty
                   onChange={(e) => {
                     setCurrNationality(e.target.value)
                     handleOnInputChange("nationality", e.target.value)
@@ -592,9 +590,9 @@ function Filter() {
               <span className="text-primary text-lg font-semibold">Helper Name</span>
               <form onSubmit={handleOnSubmit} className="border-[1px] w-full border-[#9999] rounded flex justify-between items-center pr-5">
                 <input type="text" placeholder="Search with Helper Name" className="p-2 text-sm text-secondary outline-none bg-transparent" value={helperName}
-                 onChange={(e) => {
-                  setHelperName(e.target.value)
-                }}
+                  onChange={(e) => {
+                    setHelperName(e.target.value)
+                  }}
                 />
                 <IoSearchOutline className="text-[#3a3a3a99] h-5 w-5" />
               </form>

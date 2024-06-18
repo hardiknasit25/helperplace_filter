@@ -14,7 +14,6 @@ function People() {
 
   const searchData = useSelector((state) => state.paramsData)
   const lang = useSelector((state) => state.Language)
-  // const Locations = useSelector((state) => state.Locations)
   const Skills = useSelector((state) => state.Skills)
   const contract = useSelector((state) => state.contract)
   const nationalityList = useSelector((state) => state.nationality)
